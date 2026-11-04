@@ -11,9 +11,7 @@ dist/
 .tanstack/
 .DS_Store
 .cache
-.env
 .env.
-.env.*
 !.env.example
 !.env.preview.example
 !.env.selfhost.example
@@ -50,3 +48,4 @@ dist/
 # Cloudflare Vite plugin 2.x's build output and local state
 .everyapp/
 .cloudflare/
+config.bat
