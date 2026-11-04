@@ -92,7 +92,7 @@ function getVerifyEmailPageCopy({
   // unverified hosted user would be bounced straight back by the verification
   // gate.
   return {
-    title: "Verify your email",
+    title: "Check your email",
     helperText: email
       ? `Click the link we sent to ${email} to verify your email.`
       : "Check your inbox for the link to verify your email.",

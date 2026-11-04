@@ -11,12 +11,18 @@ import {
   MapPin,
   MessageSquare,
   Search,
+  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import { linkOptions } from "@tanstack/react-router";
 import { GoogleGlyphMuted } from "@/client/features/gsc/GoogleGlyph";
 
 const projectNavItems = [
+  {
+    to: "/p/$projectId/brand-lookup" as const,
+    label: "Brand Lookup",
+    icon: Sparkles,
+  },
   {
     to: "/p/$projectId" as const,
     label: "Dashboard",
@@ -97,7 +103,7 @@ const projectNavItems = [
 // is selected, and on its own (connectNavGroup) when none is.
 const aiNavItem = linkOptions({
   to: "/ai" as const,
-  label: "Agent setup",
+  label: "AI & MCP",
   icon: Bot,
 });
 
@@ -126,42 +132,40 @@ export function getProjectNavGroups(projectId: string) {
     all.find((i) => i.to === path)!;
 
   return [
+    { label: "Core", items: [byPath("/p/$projectId")] },
     {
-      label: "Overview",
-      items: [byPath("/p/$projectId")],
-    },
-    {
-      label: "Research",
+      label: "Keywords",
       items: [
         byPath("/p/$projectId/keywords"),
+        byPath("/p/$projectId/saved"),
+        byPath("/p/$projectId/rank-tracking"),
+      ],
+    },
+    {
+      label: "Domain",
+      items: [
         byPath("/p/$projectId/domain"),
         byPath("/p/$projectId/backlinks"),
+        byPath("/p/$projectId/audit"),
       ],
     },
     {
       label: "AI Visibility",
       items: [
-        byPath("/p/$projectId/ai-visibility/research"),
+        byPath("/p/$projectId/brand-lookup"),
         byPath("/p/$projectId/prompt-explorer"),
+        aiNavItem,
         byPath("/p/$projectId/ai-visibility"),
+        byPath("/p/$projectId/ai-visibility/research"),
       ],
     },
     {
-      label: "My Site",
+      label: "Workspace",
       items: [
-        byPath("/p/$projectId/search-performance"),
-        byPath("/p/$projectId/rank-tracking"),
         byPath("/p/$projectId/local-seo"),
-        byPath("/p/$projectId/saved"),
-        byPath("/p/$projectId/audit"),
-      ],
-    },
-    {
-      label: "AI Tools",
-      items: [
+        byPath("/p/$projectId/search-performance"),
         byPath("/p/$projectId/reports"),
         byPath("/p/$projectId/context"),
-        aiNavItem,
       ],
     },
   ];

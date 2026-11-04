@@ -11,12 +11,11 @@ export const authRedirectSearchSchema = z.object({
   redirect: z.string().optional(),
 });
 
-// The auth forms keep their pre-shadcn look: white inputs with 16px text, and a
-// soft grey submit button.
+// Shared ToBa auth controls; submissions remain owned by each route.
 export const authInputClassName =
-  "border-foreground/20 bg-card text-base md:text-base";
+  "toba-auth-input bg-card text-base md:text-sm";
 export const authSubmitClassName =
-  "w-full border-border bg-[color-mix(in_oklab,var(--card),var(--foreground)_8%)] font-semibold hover:bg-[color-mix(in_oklab,var(--card),var(--foreground)_12%)]";
+  "toba-auth-submit w-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90";
 
 export function useAuthPageState(redirect: string | undefined) {
   const redirectTo = getCurrentAuthRedirect(redirect);
@@ -70,25 +69,21 @@ export function TermsAgreementNotice({ action }: { action: string }) {
 
 export function AuthMethodChooser({
   googleLabel,
-  emailLabel = "Continue with email",
   isBusy,
   disabled,
   onContinueWithGoogle,
-  onContinueWithEmail,
 }: {
   googleLabel: string;
-  emailLabel?: string;
   isBusy?: boolean;
   disabled?: boolean;
   onContinueWithGoogle: () => void;
-  onContinueWithEmail: () => void;
 }) {
   return (
     <div className="space-y-3">
       <Button
         type="button"
         variant="outline"
-        className="w-full border-black/10 !bg-white font-semibold !text-neutral-900 hover:border-black/20 hover:!bg-neutral-50"
+        className="w-full border-border bg-card font-semibold hover:bg-accent"
         onClick={onContinueWithGoogle}
         disabled={disabled || isBusy}
       >
@@ -96,15 +91,7 @@ export function AuthMethodChooser({
         {isBusy ? "Opening Google..." : googleLabel}
       </Button>
 
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full bg-card font-semibold dark:border-border dark:bg-card"
-        onClick={onContinueWithEmail}
-        disabled={disabled || isBusy}
-      >
-        {emailLabel}
-      </Button>
+      <div className="toba-auth-divider">or continue with email</div>
     </div>
   );
 }
@@ -144,15 +131,10 @@ export function AuthPageCard({
   footer?: React.ReactNode;
 }) {
   return (
-    <div className="w-full max-w-xs space-y-6">
-      <div className="space-y-3 text-center">
-        <img
-          src="/transparent-logo.png"
-          alt="OpenSEO"
-          className="mx-auto size-10 rounded-lg"
-        />
+    <div className="toba-auth-card w-full space-y-6">
+      <div className="space-y-3">
         <div>
-          <h1 className="text-xl font-semibold">{title}</h1>
+          <h1 className="text-3xl font-semibold">{title}</h1>
           {helperText ? (
             <p className="mt-1 text-sm text-muted-foreground">{helperText}</p>
           ) : null}
@@ -168,12 +150,45 @@ export function AuthPageCard({
 
 export function AuthPageShell({ children }: { children: React.ReactNode }) {
   return (
-    // `h-[100dvh]` + `overflow-y-auto` makes this a scroll container, and the
-    // auto-margin child centers when it fits but stays fully reachable (top and
-    // bottom) when it's taller than the viewport. Plain `justify-center` clips
-    // the overflow with no way to scroll to it.
-    <div className="flex h-[100dvh] flex-col items-center overflow-y-auto bg-background p-4">
-      <div className="m-auto flex w-full flex-col items-center">{children}</div>
+    <div className="toba-auth-shell">
+      <aside className="toba-auth-brand">
+        <img src="/toba/logo.svg" alt="ToBa SEO" className="toba-auth-logo" />
+        <div className="toba-auth-story">
+          <span className="toba-auth-pill">
+            SEO + AI visibility in one workspace
+          </span>
+          <h2>
+            Rank higher on Google
+            <br />
+            <span>and in AI answers.</span>
+          </h2>
+          <p>
+            Research keywords, track rankings, audit your sites and see how
+            ChatGPT, Claude, Gemini and Perplexity talk about your brand.
+          </p>
+          <div className="toba-auth-preview">
+            <p>Search visibility</p>
+            <h3>Your workspace, in focus</h3>
+            <p>Sign in to see your project’s search performance.</p>
+            <div className="toba-auth-preview-grid">
+              <span>
+                Keywords tracked<strong>—</strong>
+              </span>
+              <span>
+                Top 10 rankings<strong>—</strong>
+              </span>
+              <span>
+                AI mentions<strong>—</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+        <p className="toba-auth-legal">
+          © 2026 ToBa Tech Solutions · <a href={PRIVACY_URL}>Privacy</a> ·{" "}
+          <a href={TERMS_URL}>Terms</a>
+        </p>
+      </aside>
+      <main className="toba-auth-form">{children}</main>
     </div>
   );
 }

@@ -12,7 +12,10 @@ import { Sidebar } from "@/client/components/Sidebar";
 import { BILLING_ROUTE } from "@/shared/billing";
 import { getSeoApiKeyStatus } from "@/serverFunctions/config";
 import { getLastProjectId } from "@/client/lib/active-project";
-import { dataforseoHelpLinkOptions } from "@/client/navigation/items";
+import {
+  getProjectNavGroups,
+  dataforseoHelpLinkOptions,
+} from "@/client/navigation/items";
 import {
   SidebarInset,
   SidebarProvider,
@@ -44,7 +47,7 @@ export function AuthenticatedAppLayout({
   // pages, which update the remembered project as the user moves between them.
   const projectsQuery = useQuery({
     ...projectsQueryOptions(),
-    enabled: ready && !projectId,
+    enabled: ready,
   });
   const rememberedProjectId = getLastProjectId();
   const fallbackProjects = projectsQuery.data ?? [];
@@ -106,21 +109,45 @@ export function AuthenticatedAppLayout({
     !showMissingSeoApiKeyModal;
 
   return (
-    <SidebarProvider className="h-[100dvh] min-h-0 overflow-hidden">
+    <SidebarProvider
+      className="toba-app h-[100dvh] min-h-0 overflow-hidden"
+      style={{ "--sidebar-width": "248px" } as React.CSSProperties}
+    >
       <Sidebar
         projectId={sidebarProjectId}
         projectPending={sidebarProjectPending}
         ready={ready}
       />
-      <SidebarInset className="min-h-0 overflow-hidden md:!m-0 md:!mt-2 md:!rounded-none md:!rounded-tl-lg md:border-l md:border-t md:border-sidebar-border md:!shadow-none">
+      <SidebarInset className="min-h-0 overflow-hidden md:!m-0 md:!rounded-none md:border-l md:border-sidebar-border md:!shadow-none">
         <MobileTopBar />
+        <div className="toba-topbar hidden md:flex">
+          <span className="text-muted-foreground">
+            {fallbackProjects.find((project) => project.id === sidebarProjectId)
+              ?.name ?? "Workspace"}
+          </span>
+          <span aria-hidden="true">/</span>
+          <span>
+            {getProjectNavGroups(sidebarProjectId ?? "")
+              .flatMap((group) => group.items)
+              .find(
+                (item) =>
+                  location.pathname ===
+                  item.to.replace("$projectId", sidebarProjectId ?? ""),
+              )?.label ??
+              (location.pathname.includes("settings")
+                ? "Settings"
+                : "ToBa SEO")}
+          </span>
+        </div>
         <SeoApiStatusBanners
           shouldShowSeoApiWarning={shouldShowSeoApiWarning}
           seoApiKeyStatusError={seoApiKeyStatusError}
         />
         <LegacyDockerBanner />
         {banner}
-        <div className="min-h-0 flex-1 overflow-auto">{children}</div>
+        <div className="toba-content min-h-0 flex-1 overflow-auto">
+          {children}
+        </div>
       </SidebarInset>
 
       {showMissingSeoApiKeyModal ? (
@@ -144,7 +171,7 @@ function MobileTopBar() {
     <div className="flex shrink-0 items-center gap-1 border-b border-border bg-card px-2 py-1.5 md:hidden">
       <SidebarTrigger aria-label="Toggle sidebar" />
       <Link to="/" className="ml-1 font-semibold text-foreground">
-        OpenSEO
+        ToBa SEO
       </Link>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppForm } from "@/client/components/form/useAppForm";
 import { Button } from "@/client/components/ui/button";
 import {
@@ -39,13 +39,11 @@ function SignInPage() {
   const navigate = useNavigate();
   const { redirectTo, oauthQuery, isHostedMode, isBetterAuthMode } =
     useAuthPageState(search.redirect);
-  const [showEmailForm, setShowEmailForm] = useState(false);
   // The standalone Docker edition has accounts but no Google sign-in and no
   // emailed password reset: go straight to the email form. Accounts come from
   // invitations, and a fresh installation has nobody to sign in, so its first
   // visitor is sent to create the admin account instead.
   const emailOnly = isBetterAuthMode && !isHostedMode;
-  const emailFormVisible = showEmailForm || emailOnly;
   const google = useGoogleAuth({ redirectTo });
   const signUpStatus = useQuery({
     ...signUpStatusQueryOptions(),
@@ -123,7 +121,8 @@ function SignInPage() {
 
   return (
     <AuthPageCard
-      title="Sign in"
+      title="Welcome back"
+      helperText="Sign in to your ToBa SEO workspace to continue."
       footer={
         emailOnly ? (
           <p className="text-sm text-foreground/50">
@@ -131,22 +130,14 @@ function SignInPage() {
             password? Ask your server administrator to reset it.
           </p>
         ) : isHostedMode ? (
-          <div
-            className={
-              showEmailForm
-                ? "flex w-full justify-between text-sm text-foreground/50"
-                : "w-full text-sm text-foreground/50"
-            }
-          >
-            {showEmailForm ? (
-              <Link
-                to="/forgot-password"
-                search={getSignInSearch(redirectTo)}
-                className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-              >
-                Forgot password?
-              </Link>
-            ) : null}
+          <div className="flex w-full justify-between text-sm text-muted-foreground">
+            <Link
+              to="/forgot-password"
+              search={getSignInSearch(redirectTo)}
+              className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
+            >
+              Forgot password?
+            </Link>
             <Link
               to="/sign-up"
               search={getSignInSearch(redirectTo)}
@@ -158,7 +149,7 @@ function SignInPage() {
         ) : null
       }
     >
-      {!emailFormVisible ? (
+      {isHostedMode ? (
         <>
           <AuthMethodChooser
             googleLabel="Continue with Google"
@@ -166,10 +157,6 @@ function SignInPage() {
             isBusy={google.isStarting}
             onContinueWithGoogle={() => {
               void google.start();
-            }}
-            onContinueWithEmail={() => {
-              setShowEmailForm(true);
-              google.clearError();
             }}
           />
           {isHostedMode ? (
@@ -179,64 +166,64 @@ function SignInPage() {
             <p className="text-sm text-destructive">{google.error}</p>
           ) : null}
         </>
-      ) : (
-        <form.AppForm>
-          <form.Form className="space-y-4">
-            <form.AppField name="email">
-              {(field) => (
-                <field.TextField
-                  label="Email address"
-                  hideLabel
-                  className={authInputClassName}
-                  type="email"
-                  placeholder="Email address..."
-                  autoComplete="email"
-                  required
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="password">
-              {(field) => (
-                <field.TextField
-                  label="Password"
-                  hideLabel
-                  className={authInputClassName}
-                  type="password"
-                  placeholder="Password..."
-                  autoComplete="current-password"
-                  required
-                />
-              )}
-            </form.AppField>
+      ) : null}
+      <form.AppForm>
+        <form.Form className="space-y-4">
+          <form.AppField name="email">
+            {(field) => (
+              <field.TextField
+                label="Email address"
+                className={authInputClassName}
+                type="email"
+                placeholder="you@company.com"
+                autoComplete="email"
+                disabled={!isBetterAuthMode}
+                required
+              />
+            )}
+          </form.AppField>
+          <form.AppField name="password">
+            {(field) => (
+              <field.TextField
+                label="Password"
+                className={authInputClassName}
+                type="password"
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                disabled={!isBetterAuthMode}
+                required
+              />
+            )}
+          </form.AppField>
 
-            <form.Subscribe
-              selector={(state) => ({
-                submitError: state.errorMap.onSubmit,
-                isSubmitting: state.isSubmitting,
-              })}
-            >
-              {({ submitError, isSubmitting }) => {
-                const errorMessage = getFormError(submitError);
-                return (
-                  <>
-                    {errorMessage ? (
-                      <p className="text-sm text-destructive">{errorMessage}</p>
-                    ) : null}
-                    <Button
-                      type="submit"
-                      variant="secondary"
-                      className={authSubmitClassName}
-                      pending={isSubmitting}
-                    >
-                      {isSubmitting ? "Signing in..." : "Sign in"}
-                    </Button>
-                  </>
-                );
-              }}
-            </form.Subscribe>
-          </form.Form>
-        </form.AppForm>
-      )}
+          <form.Subscribe
+            selector={(state) => ({
+              submitError: state.errorMap.onSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ submitError, isSubmitting }) => {
+              const errorMessage = getFormError(submitError);
+              return (
+                <>
+                  {errorMessage ? (
+                    <p className="text-sm text-destructive">{errorMessage}</p>
+                  ) : null}
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    className={authSubmitClassName}
+                    pending={isSubmitting}
+                    disabled={!isBetterAuthMode}
+                  >
+                    {isSubmitting ? "Signing in..." : "Sign in"}
+                  </Button>
+                </>
+              );
+            }}
+          </form.Subscribe>
+        </form.Form>
+      </form.AppForm>
     </AuthPageCard>
   );
 }
