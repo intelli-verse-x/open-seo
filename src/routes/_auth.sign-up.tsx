@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 import { PageLoading } from "@/client/components/Spinner";
 import { useAppForm } from "@/client/components/form/useAppForm";
 import { Button } from "@/client/components/ui/button";
@@ -83,7 +82,6 @@ function SignUpPage() {
       : onboardingSearch.size > 0
         ? `/onboarding?${onboardingSearch.toString()}`
         : "/onboarding";
-  const [showEmailForm, setShowEmailForm] = useState(false);
   const google = useGoogleAuth({ redirectTo, postSignupRedirect });
   // The standalone Docker edition: no Google, no email verification, and the
   // server accepts a sign-up only for the first account or an invited address
@@ -95,7 +93,6 @@ function SignUpPage() {
     enabled: standalone,
   });
   const firstAccount = signUpStatus.data?.firstAccount === true;
-  const emailFormVisible = showEmailForm || standalone;
 
   // Turnstile is active only in hosted mode with a configured site key.
   const isTurnstileEnabled = isHostedMode && Boolean(TURNSTILE_SITE_KEY);
@@ -246,35 +243,22 @@ function SignUpPage() {
             </p>
           )
         ) : isHostedMode ? (
-          showEmailForm ? (
-            <button
-              type="button"
-              className="text-sm text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-              onClick={() => {
-                setShowEmailForm(false);
-                google.clearError();
-              }}
-            >
-              Back to signup
-            </button>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm text-foreground/50">
-                Already have an account?{" "}
-                <Link
-                  to="/sign-in"
-                  search={getSignInSearch(redirectTo)}
-                  className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          )
+          <div className="space-y-4">
+            <p className="text-sm text-foreground/50">
+              Already have an account?{" "}
+              <Link
+                to="/sign-in"
+                search={getSignInSearch(redirectTo)}
+                className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         ) : null
       }
     >
-      {!emailFormVisible ? (
+      {isHostedMode ? (
         <>
           <AuthMethodChooser
             googleLabel="Continue with Google"
@@ -282,10 +266,6 @@ function SignUpPage() {
             isBusy={google.isStarting}
             onContinueWithGoogle={() => {
               void google.start();
-            }}
-            onContinueWithEmail={() => {
-              setShowEmailForm(true);
-              google.clearError();
             }}
           />
           {isHostedMode ? (
@@ -295,88 +275,90 @@ function SignUpPage() {
             <p className="text-sm text-destructive">{google.error}</p>
           ) : null}
         </>
-      ) : (
-        <form.AppForm>
-          <form.Form className="space-y-4">
-            <form.AppField name="email">
-              {(field) => (
-                <field.TextField
-                  label="Email address"
-                  hideLabel
-                  className={authInputClassName}
-                  type="email"
-                  placeholder="Email address..."
-                  autoComplete="email"
-                  required
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="password">
-              {(field) => (
-                <field.TextField
-                  label="Password"
-                  hideLabel
-                  className={authInputClassName}
-                  type="password"
-                  placeholder="Password..."
-                  autoComplete="new-password"
-                  required
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="confirmPassword">
-              {(field) => (
-                <field.TextField
-                  label="Confirm password"
-                  hideLabel
-                  className={authInputClassName}
-                  type="password"
-                  placeholder="Confirm password..."
-                  autoComplete="new-password"
-                  required
-                />
-              )}
-            </form.AppField>
-
-            {isTurnstileEnabled ? (
-              <TurnstileWidget
-                onToken={captcha.onToken}
-                resetNonce={captcha.resetNonce}
+      ) : null}
+      <form.AppForm>
+        <form.Form className="space-y-4">
+          <form.AppField name="email">
+            {(field) => (
+              <field.TextField
+                label="Email address"
+                className={authInputClassName}
+                type="email"
+                placeholder="Email address..."
+                autoComplete="email"
+                disabled={!isBetterAuthMode}
+                required
               />
-            ) : null}
+            )}
+          </form.AppField>
+          <form.AppField name="password">
+            {(field) => (
+              <field.TextField
+                label="Password"
+                className={authInputClassName}
+                type="password"
+                placeholder="Password..."
+                autoComplete="new-password"
+                disabled={!isBetterAuthMode}
+                required
+              />
+            )}
+          </form.AppField>
+          <form.AppField name="confirmPassword">
+            {(field) => (
+              <field.TextField
+                label="Confirm password"
+                className={authInputClassName}
+                type="password"
+                placeholder="Confirm password..."
+                autoComplete="new-password"
+                disabled={!isBetterAuthMode}
+                required
+              />
+            )}
+          </form.AppField>
 
-            <form.Subscribe
-              selector={(state) => ({
-                submitError: state.errorMap.onSubmit,
-                isSubmitting: state.isSubmitting,
-              })}
-            >
-              {({ submitError, isSubmitting }) => {
-                const errorMessage = getFormError(submitError);
-                return (
-                  <>
-                    {errorMessage ? (
-                      <p className="text-sm text-destructive">{errorMessage}</p>
-                    ) : null}
-                    <Button
-                      type="submit"
-                      variant="secondary"
-                      className={authSubmitClassName}
-                      pending={isSubmitting}
-                      disabled={isTurnstileEnabled && !captcha.hasToken}
-                    >
-                      {isSubmitting ? "Creating account..." : "Create account"}
-                    </Button>
-                    {isHostedMode ? (
-                      <TermsAgreementNotice action="By creating an account" />
-                    ) : null}
-                  </>
-                );
-              }}
-            </form.Subscribe>
-          </form.Form>
-        </form.AppForm>
-      )}
+          {isTurnstileEnabled ? (
+            <TurnstileWidget
+              onToken={captcha.onToken}
+              resetNonce={captcha.resetNonce}
+            />
+          ) : null}
+
+          <form.Subscribe
+            selector={(state) => ({
+              submitError: state.errorMap.onSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ submitError, isSubmitting }) => {
+              const errorMessage = getFormError(submitError);
+              return (
+                <>
+                  {errorMessage ? (
+                    <p className="text-sm text-destructive">{errorMessage}</p>
+                  ) : null}
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    className={authSubmitClassName}
+                    pending={isSubmitting}
+                    disabled={
+                      !isBetterAuthMode ||
+                      (isTurnstileEnabled && !captcha.hasToken)
+                    }
+                  >
+                    {isSubmitting ? "Creating account..." : "Create account"}
+                  </Button>
+                  {isHostedMode ? (
+                    <TermsAgreementNotice action="By creating an account" />
+                  ) : null}
+                </>
+              );
+            }}
+          </form.Subscribe>
+        </form.Form>
+      </form.AppForm>
     </AuthPageCard>
   );
 }

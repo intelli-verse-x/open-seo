@@ -27,9 +27,9 @@ function NoResultsState({
   const { lastSearchKeyword, lastSearchLocationCode } = controller;
 
   return (
-    <div className="mx-auto w-full max-w-2xl pt-1">
+    <div className="w-full overflow-hidden rounded-2xl border border-border bg-card">
       <EmptyState
-        variant="card"
+        variant="plain"
         icon={Globe}
         title="Not enough keyword data for this query yet"
         description={

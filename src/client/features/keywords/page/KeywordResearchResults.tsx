@@ -58,10 +58,55 @@ type Props = {
 // Below md the page shows one panel at a time behind tabs, and hides the
 // overview stats and the trend chart.
 export function KeywordResearchResults({ controller }: Props) {
+  const volumes = controller.rows.flatMap((row) =>
+    row.searchVolume == null ? [] : [row.searchVolume],
+  );
+  const difficulties = controller.rows.flatMap((row) =>
+    row.keywordDifficulty == null ? [] : [row.keywordDifficulty],
+  );
+  const costs = controller.rows.flatMap((row) =>
+    row.cpc == null ? [] : [row.cpc],
+  );
+  const metrics = [
+    ["Keywords found", controller.rows.length.toLocaleString()],
+    [
+      "Total volume",
+      volumes.length
+        ? volumes.reduce((sum, value) => sum + value, 0).toLocaleString()
+        : "—",
+    ],
+    [
+      "Avg. difficulty",
+      difficulties.length
+        ? (
+            difficulties.reduce((sum, value) => sum + value, 0) /
+            difficulties.length
+          ).toFixed(0)
+        : "—",
+    ],
+    [
+      "Avg. CPC",
+      costs.length
+        ? `$${(costs.reduce((sum, value) => sum + value, 0) / costs.length).toFixed(2)}`
+        : "—",
+    ],
+  ];
   return (
     <div className="flex-1 flex flex-col overflow-hidden w-full">
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {metrics.map(([label, value]) => (
+          <Card key={label} className="gap-2 p-5">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="text-[28px] font-semibold tabular-nums">{value}</p>
+            <p className="text-xs text-muted-foreground">
+              From returned results
+              {label !== "Keywords found" ? " with available metrics" : ""}
+            </p>
+          </Card>
+        ))}
+      </div>
       <MobileTabs controller={controller} />
-      <div className="flex-1 flex flex-col xl:flex-row overflow-y-auto xl:overflow-hidden gap-4">
+      <div className="flex-1 flex flex-col overflow-y-auto gap-4">
         <KeywordPanel controller={controller} />
         <SerpPanel controller={controller} />
       </div>
@@ -91,7 +136,7 @@ function KeywordPanel({ controller }: Props) {
 
   return (
     <div
-      className={`${mobileTab === "keywords" ? "flex" : "hidden md:flex"} order-2 xl:order-1 flex-col min-w-0 gap-2 xl:basis-3/5`}
+      className={`${mobileTab === "keywords" ? "flex" : "hidden md:flex"} order-1 flex-col min-w-0 gap-4`}
     >
       {showApproximateMatchNotice ? (
         <Alert variant="warning" role="status">
@@ -273,7 +318,7 @@ function SerpPanel({ controller }: Props) {
 
   return (
     <div
-      className={`${mobileTab === "serp" ? "flex" : "hidden md:flex"} order-1 xl:order-2 flex-col min-w-0 gap-2 xl:basis-2/5 xl:overflow-y-auto`}
+      className={`${mobileTab === "serp" ? "flex" : "hidden md:flex"} order-2 flex-col min-w-0 gap-4`}
     >
       {overviewKeyword && overviewKeyword.trend.length > 0 ? (
         <Card size="sm" className="hidden shrink-0 md:flex">
