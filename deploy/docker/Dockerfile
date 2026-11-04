@@ -18,7 +18,16 @@ EXPOSE 3001
 
 # The app's boot-time build reads this to show the notice pointing to the
 # standalone image (deploy/standalone/), which replaces this one.
+# These three values are the build fingerprint on seo.toba-tech.ai. The
+# entrypoint skips vite when dist/.openseo-build-env matches the live env.
 ENV VITE_OPENSEO_LEGACY_DOCKER=true
+ENV AUTH_MODE=local_noauth
+ENV VITE_SHOW_DEVTOOLS=false
+
+RUN pnpm run build \
+  && FP="$(env | grep -E '^(VITE_|AUTH_MODE|BYPASS_EMAIL_VERIFICATION|POSTHOG_PUBLIC_KEY|POSTHOG_HOST|TURNSTILE_SITE_KEY|POSTHOG_SOURCEMAPS)' | sort | sha256sum | cut -d' ' -f1)" \
+  && test -n "$FP" \
+  && printf '%s' "$FP" > dist/.openseo-build-env
 
 # Readiness probe against the unauthenticated setup/health endpoint. The long
 # start period covers migrations plus the boot-time vite build (skipped when
