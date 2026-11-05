@@ -195,27 +195,8 @@ function SignUpPage() {
     },
   });
 
-  if (standalone && !firstAccount && !invited) {
-    if (signUpStatus.isPending) return <PageLoading />;
-    return (
-      <AuthPageCard
-        title="Registration is closed"
-        helperText="Ask an administrator for an invitation."
-        footer={
-          <p className="text-sm">
-            <Link
-              to="/sign-in"
-              search={getSignInSearch(redirectTo)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Back to sign in
-            </Link>
-          </p>
-        }
-      >
-        {null}
-      </AuthPageCard>
-    );
+  if (standalone && !firstAccount && !invited && signUpStatus.isPending) {
+    return <PageLoading />;
   }
 
   return (

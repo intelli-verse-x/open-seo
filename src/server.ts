@@ -221,6 +221,26 @@ async function handleAppRequest(
     return handleAutumnWebhookRequest(publicRequest);
   }
 
+  // The browser uses accounts. In-cluster jobs still call /mcp with no session.
+  // The header is set only by the internal proxy and stripped on the public gate.
+  const mcpInternal = Reflect.get(env, "OPENSEO_MCP_INTERNAL");
+  if (
+    pathname === MCP_ROUTE &&
+    typeof mcpInternal === "string" &&
+    mcpInternal.length >= 16 &&
+    request.headers.get("x-openseo-internal") === mcpInternal
+  ) {
+    return import("@/server/mcp/transport").then(
+      ({ handleSelfHostedOpenSeoMcpRequest }) =>
+        handleSelfHostedOpenSeoMcpRequest(
+          publicRequest,
+          "local_noauth",
+          env,
+          ctx,
+        ),
+    );
+  }
+
   if (usesBetterAuth(authMode)) {
     return openSeoOAuthProvider.fetch(
       publicRequest,

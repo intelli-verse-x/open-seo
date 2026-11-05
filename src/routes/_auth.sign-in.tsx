@@ -124,29 +124,22 @@ function SignInPage() {
       title="Welcome back"
       helperText="Sign in to your ToBa SEO workspace to continue."
       footer={
-        emailOnly ? (
-          <p className="text-sm text-foreground/50">
-            Need an account? Ask an administrator for an invitation. Forgot your
-            password? Ask your server administrator to reset it.
-          </p>
-        ) : isHostedMode ? (
-          <div className="flex w-full justify-between text-sm text-muted-foreground">
-            <Link
-              to="/forgot-password"
-              search={getSignInSearch(redirectTo)}
-              className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-            >
-              Forgot password?
-            </Link>
-            <Link
-              to="/sign-up"
-              search={getSignInSearch(redirectTo)}
-              className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-            >
-              Create account
-            </Link>
-          </div>
-        ) : null
+        <div className="flex w-full justify-between text-sm text-muted-foreground">
+          <Link
+            to="/forgot-password"
+            search={getSignInSearch(redirectTo)}
+            className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
+          >
+            Forgot password?
+          </Link>
+          <Link
+            to="/sign-up"
+            search={getSignInSearch(redirectTo)}
+            className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
+          >
+            Create account
+          </Link>
+        </div>
       }
     >
       {isHostedMode ? (
