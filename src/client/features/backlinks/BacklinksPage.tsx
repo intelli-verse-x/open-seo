@@ -107,7 +107,7 @@ export function BacklinksPage({
       <div className="mx-auto max-w-7xl space-y-4">
         <PageHeader
           title="Backlinks"
-          description="Understand who links to a site, what changed recently, and which pages attract links."
+          description="See who links to any domain and how link equity is changing."
           backLink={
             searchState.target ? (
               <BackLink

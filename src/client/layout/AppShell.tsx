@@ -14,6 +14,7 @@ import { getSeoApiKeyStatus } from "@/serverFunctions/config";
 import { getLastProjectId } from "@/client/lib/active-project";
 import {
   getProjectNavGroups,
+  connectNavGroup,
   dataforseoHelpLinkOptions,
 } from "@/client/navigation/items";
 import {
@@ -127,7 +128,7 @@ export function AuthenticatedAppLayout({
           </span>
           <span aria-hidden="true">/</span>
           <span>
-            {getProjectNavGroups(sidebarProjectId ?? "")
+            {[...getProjectNavGroups(sidebarProjectId ?? ""), connectNavGroup]
               .flatMap((group) => group.items)
               .find(
                 (item) =>

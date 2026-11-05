@@ -32,6 +32,7 @@ import { signOutAndRedirect, useSession } from "@/lib/auth-client";
 import {
   isEveryAppClientAuthMode,
   isHostedClientAuthMode,
+  usesBetterAuthClient,
 } from "@/lib/auth-mode";
 import { everyAppAccountQueryOptions } from "@/client/features/every-app/everyAppAccountQueries";
 import { BILLING_ROUTE } from "@/shared/billing";
@@ -284,9 +285,27 @@ function AccountFooter({ ready }: { ready: boolean }) {
       <SidebarMenu>
         <SidebarNavLink
           icon={CircleHelp}
-          label="Help & Community"
+          label="Help & Support"
           linkProps={{ to: "/support" }}
         />
+        {email && !everyApp ? (
+          <>
+            <SidebarNavLink
+              icon={Settings}
+              label="Settings"
+              linkProps={{ to: "/settings" }}
+            />
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className={navButtonClass}
+                onClick={() => signOutAndRedirect()}
+              >
+                <LogOut className="size-4" />
+                <span>Sign out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </>
+        ) : null}
         {everyApp ? (
           <SidebarNavLink
             icon={Settings}
@@ -380,9 +399,11 @@ function AccountFooter({ ready }: { ready: boolean }) {
           </SidebarMenuItem>
         ) : ready ? (
           <SidebarNavLink
-            icon={Settings}
-            label="Settings"
-            linkProps={{ to: "/settings" }}
+            icon={usesBetterAuthClient() ? User : Settings}
+            label={usesBetterAuthClient() ? "Sign in" : "Settings"}
+            linkProps={{
+              to: usesBetterAuthClient() ? "/sign-in" : "/settings",
+            }}
           />
         ) : (
           // The account row's slot while the session loads.

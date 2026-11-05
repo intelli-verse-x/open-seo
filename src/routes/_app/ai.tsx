@@ -1,3 +1,4 @@
+import { ApiKeySettings } from "@/client/features/settings/ApiKeySettings";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { everyAppAccountQueryOptions } from "@/client/features/every-app/everyAppAccountQueries";
@@ -19,7 +20,7 @@ import {
 } from "@/client/components/ui/card";
 import { PageHeader } from "@/client/components/PageHeader";
 import { ArrowUpRight, Info } from "lucide-react";
-import { getClientAuthMode } from "@/lib/auth-mode";
+import { getClientAuthMode, usesBetterAuthClient } from "@/lib/auth-mode";
 import { captureClientEvent } from "@/client/lib/posthog";
 import {
   agentUpdatePrompt,
@@ -89,7 +90,7 @@ function AiPage() {
       <div className="mx-auto max-w-7xl">
         <PageHeader
           title="AI & MCP"
-          description="The most powerful way to use OpenSEO is through the AI agent you already use. Set it up once, then ask it anything."
+          description="Connect ToBa SEO to Claude, ChatGPT, Cursor and other AI agents through MCP."
         />
 
         <Tabs
@@ -111,7 +112,24 @@ function AiPage() {
               <EveryAppAgentSetup />
             ) : (
               <>
-                <div className="mt-6 space-y-5">
+                <Card size="lg" className="mt-6">
+                  <CardHeader>
+                    <CardTitle>MCP server</CardTitle>
+                    <CardDescription>
+                      Connect an AI agent to your SEO workspace.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex items-center justify-between gap-4">
+                    <code className="min-w-0 break-all">{mcpUrl}</code>
+                    <CopyButton
+                      value={mcpUrl}
+                      label="Copy"
+                      successMessage="MCP URL copied"
+                      onCopy={() => captureClientEvent("mcp:setup_url_copy")}
+                    />
+                  </CardContent>
+                </Card>
+                <div className="mt-6 grid items-start gap-5 xl:grid-cols-2">
                   <Card size="lg">
                     <CardHeader>
                       <CardTitle>
@@ -218,19 +236,13 @@ function AiPage() {
                   </Alert>
                 ) : null}
 
-                <div className="mt-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border pt-5 text-xs text-muted-foreground">
-                  <span>
-                    MCP server URL for this instance:{" "}
-                    <code className="font-mono text-foreground/80">
-                      {mcpUrl}
-                    </code>
-                  </span>
-                  <CopyButton
-                    value={mcpUrl}
-                    successMessage="MCP URL copied"
-                    onCopy={() => captureClientEvent("mcp:setup_url_copy")}
-                  />
-                </div>
+                {usesBetterAuthClient() ? (
+                  <Card size="lg" className="mt-6">
+                    <CardContent>
+                      <ApiKeySettings />
+                    </CardContent>
+                  </Card>
+                ) : null}
               </>
             )}
           </TabsContent>
