@@ -1,3 +1,4 @@
+import { RankTrackingStats } from "./RankTrackingStats";
 import {
   Table,
   TableBody,
@@ -15,7 +16,6 @@ import {
   AlertTriangle,
   Archive,
   CircleAlert,
-  Globe,
   Info,
   Plus,
   ChevronRight,
@@ -163,6 +163,10 @@ export function RankTrackingDomainList({
           isScheduledRankTrackingInterval(summary.scheduleInterval),
         )}
       />
+      <RankTrackingStats
+        summaries={summaries}
+        pending={summariesQuery.isPending}
+      />
       <Card className="gap-0 py-0">
         <CardHeader className="px-5 pt-4 pb-3">
           <CardTitle>
@@ -198,20 +202,39 @@ export function RankTrackingDomainList({
           )}
           {summariesQuery.isPending ? (
             <div className="space-y-4 px-5 py-4" aria-busy>
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-72" />
-                </div>
-              ))}
+              <Skeleton className="h-32 w-full" />
             </div>
           ) : !summaries ? null : summaries.length === 0 ? (
-            <EmptyState
-              variant="plain"
-              icon={Globe}
-              title="No tracked domains yet"
-              description="Add a domain to start monitoring keyword rankings over time."
-            />
+            <div className="p-5">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {[
+                      "Domain",
+                      "Market",
+                      "Keywords",
+                      "Avg. pos.",
+                      "Top 10",
+                      "Change",
+                      "Last check",
+                    ].map((label) => (
+                      <TableHead key={label}>{label}</TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="h-36 text-center text-muted-foreground"
+                    >
+                      No tracked domains yet. Add a domain to start monitoring
+                      rankings.
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
           ) : filteredSummaries.length === 0 ? (
             <EmptyState
               variant="plain"

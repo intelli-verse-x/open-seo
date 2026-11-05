@@ -35,7 +35,67 @@ type Props = {
 const DOMAIN_LEVEL_TIP =
   "AI search providers report mentions per domain, not per page. This number covers the whole domain — the cited pages below are limited to your scope.";
 
-export function BrandLookupResults({ result, projectId }: Props) {
+export function BrandLookupResults(props: Props) {
+  const { result } = props;
+  const chat = result.perPlatform.find((row) => row.platform === "chat_gpt");
+  return (
+    <div className="space-y-6">
+      <div className="toba-dashboard-stats">
+        {[
+          ["AI visibility score", "—"],
+          [
+            "Mentioned in",
+            result.perPlatform.filter(
+              (row) => row.status === "success" && (row.mentions ?? 0) > 0,
+            ).length,
+          ],
+          ["Avg. answer position", "—"],
+          ["Citations", result.hasData ? result.topPages.length : "—"],
+        ].map(([label, value]) => (
+          <section key={label} className="toba-stat">
+            <p>{label}</p>
+            <strong>{value}</strong>
+            <small>
+              {label === "Citations"
+                ? "Returned source pages"
+                : label === "Mentioned in"
+                  ? "Reporting platforms"
+                  : "Not available"}
+            </small>
+          </section>
+        ))}
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {["ChatGPT", "Claude", "Gemini", "Perplexity"].map((model) => (
+          <section className="toba-panel min-h-44" key={model}>
+            <h2>{model}</h2>
+            <p className="mt-4">
+              {model === "ChatGPT" && chat?.status === "success"
+                ? `${chat.mentions ?? "—"} mentions`
+                : "Data unavailable for this model."}
+            </p>
+            {model === "ChatGPT"
+              ? result.topQueries
+                  .filter((row) => row.platform === "chat_gpt")
+                  .slice(0, 1)
+                  .map((row) => (
+                    <p
+                      key={row.question}
+                      className="mt-4 rounded-lg bg-muted p-3"
+                    >
+                      {row.question}
+                    </p>
+                  ))
+              : null}
+          </section>
+        ))}
+      </div>
+      <BrandLookupDetails {...props} />
+    </div>
+  );
+}
+
+function BrandLookupDetails({ result, projectId }: Props) {
   if (!result.hasData) {
     const erroredPlatforms = result.perPlatform.filter(
       (p) => p.status === "error",

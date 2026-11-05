@@ -114,6 +114,7 @@ function VerifyEmailPage() {
   const email = search.email ?? session?.user?.email;
   const isVerified = !!session?.user?.emailVerified;
   const [isResending, setIsResending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   // Verified (or bypass) users are sent on to the app by the effect below; until
   // that lands we show the redirecting state instead of the resend prompt.
   const isRedirecting =
@@ -165,6 +166,10 @@ function VerifyEmailPage() {
   }, [verificationIssueType]);
 
   async function handleResend() {
+    if (!isHostedMode) {
+      setSendError("Mail is not configured. Contact your administrator.");
+      return;
+    }
     if (!email) return;
     setIsResending(true);
     try {
@@ -208,7 +213,21 @@ function VerifyEmailPage() {
           </p>
         }
       >
-        {!isHostedMode ? null : errorMessage ? (
+        {!isHostedMode ? (
+          <>
+            <Button
+              className={authSubmitClassName}
+              onClick={() => void handleResend()}
+            >
+              Resend link
+            </Button>
+            {sendError ? (
+              <p role="alert" className="text-sm text-destructive">
+                {sendError}
+              </p>
+            ) : null}
+          </>
+        ) : errorMessage ? (
           <p className="text-sm text-destructive">{errorMessage}</p>
         ) : isPending || isRedirecting ? (
           <div className="flex justify-center py-4">

@@ -382,7 +382,9 @@ html[data-theme="openseo-dark"] {
   font-display: swap;
 }
 :where(:root),
-[data-theme="openseo"] {
+[data-theme="openseo"],
+[data-theme="openseo-dark"] {
+  color-scheme: light;
   --background: #f5efe3;
   --foreground: #101820;
   --card: #fffaf1;
@@ -619,7 +621,7 @@ h3,
 }
 [data-theme="openseo-dark"] .toba-logo,
 [data-theme="openseo-dark"] .toba-auth-logo {
-  content: url("/toba/logo-dark.svg");
+  content: url("/toba/logo.svg");
 }
 @media (min-width: 768px) {
   .toba-content > div {
@@ -761,4 +763,204 @@ h3,
   .toba-content [data-slot="table-card"] {
     padding: 12px;
   }
+}
+
+/* The ToBa frames use a fixed light palette, including stored dark preferences. */
+.toba-auth-preview {
+  position: relative;
+  gap: 0;
+}
+.toba-auth-preview h3 {
+  font-family: Poppins, sans-serif;
+  font-size: 30px;
+  line-height: 1.3;
+}
+.toba-preview-change {
+  position: absolute;
+  right: 24px;
+  top: 40px;
+  border-radius: 20px;
+  background: #e2f1e6;
+  color: #2f7d4f;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.toba-preview-bars {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  height: 90px;
+  margin-bottom: 16px;
+}
+.toba-preview-bars i {
+  flex: 1;
+  background: #f3ebdb;
+  border-radius: 4px;
+}
+.toba-preview-bars i:nth-last-child(-n + 3) {
+  background: #173f43;
+}
+.toba-auth-preview-grid {
+  padding-top: 0;
+}
+.toba-auth-preview-grid span {
+  padding: 12px 14px;
+}
+.toba-auth-preview-grid span:nth-child(2) strong {
+  color: #2f7d4f;
+}
+.toba-auth-card button {
+  min-height: 42px;
+}
+.toba-password-strength > div {
+  display: flex;
+  gap: 4px;
+}
+.toba-password-strength span {
+  height: 4px;
+  flex: 1;
+  background: var(--border);
+  border-radius: 4px;
+}
+.toba-password-strength span[data-filled="true"] {
+  background: var(--success);
+}
+.toba-password-strength p {
+  margin-top: 6px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+.toba-topbar-search {
+  margin-left: auto;
+  width: 300px;
+}
+.toba-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.toba-stat {
+  padding: 20px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 16px;
+  min-height: 134px;
+}
+.toba-stat p {
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+.toba-stat strong {
+  display: block;
+  font-size: 28px;
+  margin: 8px 0;
+  font-weight: 600;
+}
+.toba-stat small {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.toba-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px 16px;
+}
+.toba-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+.toba-panel h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.toba-panel p {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.toba-empty-chart {
+  min-height: 250px;
+  display: grid;
+  place-items: center;
+  margin-top: 24px;
+  border-bottom: 1px solid var(--border);
+  background: repeating-linear-gradient(
+    to top,
+    transparent 0,
+    transparent 47px,
+    var(--border) 48px,
+    transparent 49px
+  );
+}
+.toba-model {
+  margin: 22px 0;
+  font-size: 13px;
+}
+.toba-model span {
+  float: right;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.toba-model i {
+  display: block;
+  height: 6px;
+  background: var(--muted);
+  border-radius: 6px;
+  margin-top: 8px;
+}
+@media (max-width: 1000px) {
+  .toba-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .toba-dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .toba-dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+}
+.toba-app [data-slot="sidebar-footer"] {
+  padding: 16px;
+  border-top: 0;
+}
+.toba-app [data-slot="sidebar-footer"] [aria-label="Open account menu"] {
+  height: 60px;
+  margin-top: 16px;
+  border: 1px solid var(--border);
+}
+.toba-auth-preview {
+  height: 276px;
+  min-height: 276px;
+}
+.toba-auth-preview-grid span {
+  padding-block: 10px;
+}
+.toba-select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: var(--card);
+  font-size: 14px;
+  max-width: 160px;
+}
+.toba-app [data-slot="input"],
+.toba-app [data-slot="input-group"],
+.toba-app [data-slot="textarea"] {
+  background-color: var(--card);
+}
+.toba-stat strong {
+  line-height: 1.3;
+}
+.toba-dashboard-grid > .toba-panel {
+  min-height: 300px;
+}
+.toba-topbar [data-slot="input"] {
+  height: 40px;
+}
+.toba-app [data-slot="sidebar-group-label"] {
+  border-radius: 0;
 }

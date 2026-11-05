@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { UseQueryResult } from "@tanstack/react-query";
-import { ScanSearch, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import type { getAuditHistory } from "@/serverFunctions/audit";
-import { EmptyState } from "@/client/components/EmptyState";
 import { QueryState } from "@/client/components/QueryState";
 import { RowActionsMenu } from "@/client/components/RowActionsMenu";
 import { DataTableToolbar } from "@/client/components/table/DataTableToolbar";
@@ -56,10 +55,6 @@ function AuditHistoryTable({
   history: AuditHistory;
   onDelete: (auditId: string) => void;
 }) {
-  if (history.length === 0) {
-    return <EmptyState icon={ScanSearch} title="No audits yet" />;
-  }
-
   return (
     <TableCard>
       <DataTableToolbar>
@@ -77,6 +72,16 @@ function AuditHistoryTable({
           </TableRow>
         </TableHeader>
         <TableBody>
+          {history.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="h-24 text-center text-muted-foreground"
+              >
+                No audits yet.
+              </TableCell>
+            </TableRow>
+          ) : null}
           {history.map((audit) => (
             <TableRow key={audit.id} className="group">
               <TableCell className="text-xs text-muted-foreground">

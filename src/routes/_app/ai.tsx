@@ -112,110 +112,151 @@ function AiPage() {
               <EveryAppAgentSetup />
             ) : (
               <>
-                <Card size="lg" className="mt-6">
-                  <CardHeader>
-                    <CardTitle>MCP server</CardTitle>
-                    <CardDescription>
-                      Connect an AI agent to your SEO workspace.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex items-center justify-between gap-4">
-                    <code className="min-w-0 break-all">{mcpUrl}</code>
-                    <CopyButton
-                      value={mcpUrl}
-                      label="Copy"
-                      successMessage="MCP URL copied"
-                      onCopy={() => captureClientEvent("mcp:setup_url_copy")}
-                    />
-                  </CardContent>
-                </Card>
-                <div className="mt-6 grid items-start gap-5 xl:grid-cols-2">
+                <div className="toba-dashboard-grid mt-6">
                   <Card size="lg">
                     <CardHeader>
-                      <CardTitle>
-                        <h2>Set up your agent</h2>
-                      </CardTitle>
+                      <CardTitle>MCP server</CardTitle>
                       <CardDescription>
-                        Paste the setup prompt into your agent to connect
-                        OpenSEO and install its SEO skills. It will guide you
-                        through any manual steps.
+                        Connect an AI agent to your SEO workspace.
                       </CardDescription>
                     </CardHeader>
+                    <CardContent className="flex items-center justify-between gap-4">
+                      <code className="min-w-0 break-all">{mcpUrl}</code>
+                      <CopyButton
+                        value={mcpUrl}
+                        label="Copy"
+                        successMessage="MCP URL copied"
+                        onCopy={() => captureClientEvent("mcp:setup_url_copy")}
+                      />
+                    </CardContent>
                     <CardContent>
                       <AgentList />
-                      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+                      <pre className="mt-4 overflow-auto rounded-lg border border-border bg-muted p-4 text-xs">
+                        {JSON.stringify(
+                          { mcpServers: { "toba-seo": { url: mcpUrl } } },
+                          null,
+                          2,
+                        )}
+                      </pre>
+                    </CardContent>
+                  </Card>
+                  <section className="toba-panel">
+                    <h2>Available tools</h2>
+                    <p>Tools exposed to agents</p>
+                    {[
+                      "keyword_research",
+                      "rank_tracking",
+                      "domain_overview",
+                      "backlinks",
+                      "site_audit",
+                      "brand_lookup",
+                      "prompt_explorer",
+                    ].map((tool) => (
+                      <p className="mt-4" key={tool}>
+                        ✓ {tool}
+                      </p>
+                    ))}
+                  </section>
+                </div>
+                {usesBetterAuthClient() ? (
+                  <Card className="mt-6">
+                    <CardContent>
+                      <ApiKeySettings />
+                    </CardContent>
+                  </Card>
+                ) : null}
+                <details className="mt-6">
+                  <summary className="cursor-pointer text-sm text-primary">
+                    Agent setup and update instructions
+                  </summary>
+                  <div className="mt-6 grid items-start gap-5 xl:grid-cols-2">
+                    <Card size="lg">
+                      <CardHeader>
+                        <CardTitle>
+                          <h2>Set up your agent</h2>
+                        </CardTitle>
+                        <CardDescription>
+                          Paste the setup prompt into your agent to connect
+                          OpenSEO and install its SEO skills. It will guide you
+                          through any manual steps.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <AgentList />
+                        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+                          <CopyButton
+                            variant="default"
+                            size="lg"
+                            value={prompt}
+                            label="Copy setup prompt"
+                            successMessage="Setup prompt copied"
+                            onCopy={() =>
+                              captureClientEvent("mcp:setup_prompt_copy")
+                            }
+                          />
+                          <a
+                            href={`${DOCS_URL}#set-up-your-agent`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={MUTED_LINK_CLASS}
+                          >
+                            Setup instructions
+                            <ArrowUpRight className="size-3.5" />
+                          </a>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="text-muted-foreground">
+                        <p>
+                          Once connected, ask your agent to use{" "}
+                          <a
+                            href={COACH_DOCS_URL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={LINK_CLASS}
+                          >
+                            SEO Coach
+                          </a>{" "}
+                          to help you choose what to do next.
+                        </p>
+                      </CardFooter>
+                    </Card>
+
+                    <Card size="lg">
+                      <CardHeader>
+                        <CardTitle>
+                          <h2>Update your skills</h2>
+                        </CardTitle>
+                        <CardDescription>
+                          Already connected? Paste the update prompt into your
+                          agent to get the latest OpenSEO skills while
+                          preserving your connection settings and personal
+                          edits.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex flex-wrap items-center gap-x-5 gap-y-3">
                         <CopyButton
                           variant="default"
                           size="lg"
-                          value={prompt}
-                          label="Copy setup prompt"
-                          successMessage="Setup prompt copied"
+                          value={agentUpdatePrompt}
+                          label="Copy update prompt"
+                          successMessage="Update prompt copied"
                           onCopy={() =>
-                            captureClientEvent("mcp:setup_prompt_copy")
+                            captureClientEvent("mcp:update_prompt_copy")
                           }
                         />
                         <a
-                          href={`${DOCS_URL}#set-up-your-agent`}
+                          href={`${DOCS_URL}#update-your-skills`}
                           target="_blank"
                           rel="noreferrer"
                           className={MUTED_LINK_CLASS}
                         >
-                          Setup instructions
+                          Update instructions
                           <ArrowUpRight className="size-3.5" />
                         </a>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="text-muted-foreground">
-                      <p>
-                        Once connected, ask your agent to use{" "}
-                        <a
-                          href={COACH_DOCS_URL}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={LINK_CLASS}
-                        >
-                          SEO Coach
-                        </a>{" "}
-                        to help you choose what to do next.
-                      </p>
-                    </CardFooter>
-                  </Card>
-
-                  <Card size="lg">
-                    <CardHeader>
-                      <CardTitle>
-                        <h2>Update your skills</h2>
-                      </CardTitle>
-                      <CardDescription>
-                        Already connected? Paste the update prompt into your
-                        agent to get the latest OpenSEO skills while preserving
-                        your connection settings and personal edits.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-wrap items-center gap-x-5 gap-y-3">
-                      <CopyButton
-                        variant="default"
-                        size="lg"
-                        value={agentUpdatePrompt}
-                        label="Copy update prompt"
-                        successMessage="Update prompt copied"
-                        onCopy={() =>
-                          captureClientEvent("mcp:update_prompt_copy")
-                        }
-                      />
-                      <a
-                        href={`${DOCS_URL}#update-your-skills`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={MUTED_LINK_CLASS}
-                      >
-                        Update instructions
-                        <ArrowUpRight className="size-3.5" />
-                      </a>
-                    </CardContent>
-                  </Card>
-                </div>
-
+                      </CardContent>
+                    </Card>
+                  </div>
+                </details>
                 {getClientAuthMode() === "cloudflare_access" ? (
                   <Alert className="mt-8">
                     <Info />
@@ -234,14 +275,6 @@ function AiPage() {
                       </a>
                     </AlertDescription>
                   </Alert>
-                ) : null}
-
-                {usesBetterAuthClient() ? (
-                  <Card size="lg" className="mt-6">
-                    <CardContent>
-                      <ApiKeySettings />
-                    </CardContent>
-                  </Card>
                 ) : null}
               </>
             )}

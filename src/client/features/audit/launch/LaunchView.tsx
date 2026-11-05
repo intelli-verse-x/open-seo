@@ -47,6 +47,23 @@ export function LaunchView({
           outOfCredits={controller.outOfCredits}
         />
 
+        {!controller.historyQuery.data?.length ? (
+          <div className="grid gap-4 md:grid-cols-[280px_1fr]">
+            <section className="toba-panel">
+              <h2>Site health</h2>
+              <div className="mx-auto my-8 grid size-32 place-items-center rounded-full border-8 border-border text-3xl">
+                —
+              </div>
+              <p>No completed audit yet.</p>
+            </section>
+            <section className="toba-panel">
+              <h2>Top issues</h2>
+              <p className="py-20 text-center">
+                Run an audit to see technical issues here.
+              </p>
+            </section>
+          </div>
+        ) : null}
         <AuditHistorySection
           projectId={projectId}
           historyQuery={controller.historyQuery}

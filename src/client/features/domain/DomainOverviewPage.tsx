@@ -1,3 +1,4 @@
+import { ResearchEmptyPanels } from "@/client/components/ResearchEmptyPanels";
 /* eslint-disable max-lines, max-lines-per-function -- Domain Overview keeps page-only orchestration colocated to avoid fake indirection. */
 import { useCallback, useEffect, useMemo, useRef, type FormEvent } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
@@ -591,7 +592,25 @@ export function DomainOverviewPage({
             {overviewError}
           </>
         ) : state.overview === null ? (
-          <div className="pt-1">
+          <div className="space-y-6 pt-1">
+            <ResearchEmptyPanels
+              metrics={[
+                "Organic traffic",
+                "Organic keywords",
+                "Backlinks",
+                "Referring domains",
+              ]}
+              title="Organic traffic"
+              chart
+              columns={[
+                "Keyword",
+                "Position",
+                "Volume",
+                "Traffic",
+                "KD",
+                "URL",
+              ]}
+            />
             <RecentSearches
               items={state.history}
               loaded={state.historyLoaded}
