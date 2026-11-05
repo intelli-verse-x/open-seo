@@ -270,47 +270,49 @@ export function BrandLookupPage({
         <BrandLookupResults result={result} projectId={projectId} />
       )}
       history={
-        <RecentSearches
-          items={history}
-          loaded={historyLoaded}
-          onRemove={removeHistoryItem}
-          emptyIcon={Sparkles}
-          emptyTitle="Search a brand name or domain to see how AI cites it"
-          getTitle={(item) => (
-            <>
-              {item.query}
-              {/* Only non-default scopes are stored, so this badge always
+        history.length ? (
+          <RecentSearches
+            items={history}
+            loaded={historyLoaded}
+            onRemove={removeHistoryItem}
+            emptyIcon={Sparkles}
+            emptyTitle="Search a brand name or domain to see how AI cites it"
+            getTitle={(item) => (
+              <>
+                {item.query}
+                {/* Only non-default scopes are stored, so this badge always
                   adds information the query string doesn't carry. */}
-              {item.scope ? (
-                <Badge variant="secondary" className="ml-2">
-                  {RESEARCH_SCOPE_LABELS[item.scope]}
-                </Badge>
-              ) : null}
-            </>
-          )}
-          getSubtitle={(item) =>
-            item.competitors.length > 0
-              ? `vs ${item.competitors.join(", ")}`
-              : null
-          }
-          renderLink={(item, props) => (
-            <Link
-              from="/p/$projectId/brand-lookup"
-              to="/p/$projectId/brand-lookup"
-              params={{ projectId }}
-              search={{
-                q: item.query,
-                c:
-                  item.competitors.length > 0
-                    ? item.competitors.join(",")
-                    : undefined,
-                scope: item.scope,
-              }}
-              replace
-              {...props}
-            />
-          )}
-        />
+                {item.scope ? (
+                  <Badge variant="secondary" className="ml-2">
+                    {RESEARCH_SCOPE_LABELS[item.scope]}
+                  </Badge>
+                ) : null}
+              </>
+            )}
+            getSubtitle={(item) =>
+              item.competitors.length > 0
+                ? `vs ${item.competitors.join(", ")}`
+                : null
+            }
+            renderLink={(item, props) => (
+              <Link
+                from="/p/$projectId/brand-lookup"
+                to="/p/$projectId/brand-lookup"
+                params={{ projectId }}
+                search={{
+                  q: item.query,
+                  c:
+                    item.competitors.length > 0
+                      ? item.competitors.join(",")
+                      : undefined,
+                  scope: item.scope,
+                }}
+                replace
+                {...props}
+              />
+            )}
+          />
+        ) : null
       }
     />
   );

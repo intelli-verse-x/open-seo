@@ -41,6 +41,15 @@ function ForgotPasswordPage() {
       onSubmit: forgotPasswordSchema,
     },
     onSubmit: async ({ formApi, value }) => {
+      if (isOperatorReset) {
+        formApi.setErrorMap({
+          onSubmit: {
+            form: "Mail is not configured. Ask your administrator to reset your password.",
+            fields: {},
+          },
+        });
+        return;
+      }
       try {
         const redirectUrl = new URL("/reset-password", window.location.origin);
         if (redirectTo !== "/")
@@ -93,7 +102,7 @@ function ForgotPasswordPage() {
                   : isHostedMode
                     ? "Enter your email and we'll send you a password reset link."
                     : isOperatorReset
-                      ? "Ask your server administrator to reset your password."
+                      ? "Enter the email linked to your account and we’ll send you a secure reset link."
                       : "Password reset isn't available right now."
               }
               footer={
@@ -126,7 +135,7 @@ function ForgotPasswordPage() {
                           type="email"
                           placeholder="you@company.com"
                           autoComplete="email"
-                          disabled={!isHostedMode}
+                          disabled={!usesBetterAuthClient()}
                           required
                         />
                       )}
@@ -142,7 +151,7 @@ function ForgotPasswordPage() {
                       variant="secondary"
                       className={authSubmitClassName}
                       pending={isSubmitting}
-                      disabled={!isHostedMode}
+                      disabled={!usesBetterAuthClient()}
                     >
                       {isSubmitting
                         ? "Sending reset link..."

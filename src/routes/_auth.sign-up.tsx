@@ -1,3 +1,6 @@
+import { PRIVACY_URL, TERMS_URL } from "@/shared/terms";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PageLoading } from "@/client/components/Spinner";
@@ -6,7 +9,6 @@ import { Button } from "@/client/components/ui/button";
 import {
   AuthPageCard,
   AuthMethodChooser,
-  TermsAgreementNotice,
   authInputClassName,
   authSubmitClassName,
   authRedirectSearchSchema,
@@ -37,17 +39,12 @@ const UTM_PARAMS = [
   "utm_content",
 ] as const;
 
-const signUpSchema = z
-  .object({
-    name: z.string().trim().min(1, "Enter your full name."),
-    email: z.string().trim().email("Enter a valid email address."),
-    password: passwordSchema,
-    confirmPassword: z.string(),
-  })
-  .refine((value) => value.password === value.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
-  });
+const signUpSchema = z.object({
+  name: z.string().trim().min(1, "Enter your full name."),
+  email: z.string().trim().email("Enter a valid email address."),
+  password: passwordSchema,
+  acceptTerms: z.boolean().refine(Boolean, "Agree to the terms to continue."),
+});
 
 export const Route = createFileRoute("/_auth/sign-up")({
   validateSearch: authRedirectSearchSchema.extend({
@@ -67,6 +64,7 @@ export const Route = createFileRoute("/_auth/sign-up")({
 
 function SignUpPage() {
   const search = Route.useSearch();
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { redirectTo, isHostedMode, isBetterAuthMode } = useAuthPageState(
     search.redirect,
@@ -104,7 +102,7 @@ function SignUpPage() {
       name: "",
       email: "",
       password: "",
-      confirmPassword: "",
+      acceptTerms: false,
     },
     validators: {
       onSubmit: signUpSchema,
@@ -241,24 +239,21 @@ function SignUpPage() {
         ) : null
       }
     >
-      {isHostedMode ? (
+      {
         <>
           <AuthMethodChooser
-            googleLabel="Continue with Google"
-            disabled={!isHostedMode}
+            googleLabel="Sign up with Google"
+            disabled={!isBetterAuthMode}
             isBusy={google.isStarting}
             onContinueWithGoogle={() => {
               void google.start();
             }}
           />
-          {isHostedMode ? (
-            <TermsAgreementNotice action="By continuing" />
-          ) : null}
           {google.error ? (
             <p className="text-sm text-destructive">{google.error}</p>
           ) : null}
         </>
-      ) : null}
+      }
       <form.AppForm>
         <form.Form className="space-y-4">
           <form.AppField name="name">
@@ -276,7 +271,7 @@ function SignUpPage() {
           <form.AppField name="email">
             {(field) => (
               <field.TextField
-                label="Email address"
+                label="Work email"
                 className={authInputClassName}
                 type="email"
                 placeholder="you@company.com"
@@ -288,27 +283,74 @@ function SignUpPage() {
           </form.AppField>
           <form.AppField name="password">
             {(field) => (
-              <field.TextField
-                label="Password"
-                className={authInputClassName}
-                type="password"
-                placeholder="Enter your password"
-                autoComplete="new-password"
-                disabled={!isBetterAuthMode}
-                required
-              />
+              <div className="toba-password-field">
+                <field.TextField
+                  label="Password"
+                  className={authInputClassName}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Min. 12 characters"
+                  autoComplete="new-password"
+                  disabled={!isBetterAuthMode}
+                  required
+                />
+                <button
+                  type="button"
+                  className="toba-password-toggle"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword((value) => !value)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             )}
           </form.AppField>
-          <form.AppField name="confirmPassword">
+          <form.Subscribe selector={(state) => state.values.password}>
+            {(password) => (
+              <div
+                className="toba-password-strength"
+                aria-label="Password strength"
+              >
+                <div>
+                  {[1, 2, 3, 4].map((level) => (
+                    <span
+                      key={level}
+                      data-filled={password.length >= level * 3}
+                    />
+                  ))}
+                </div>
+                <p>
+                  Use 12+ characters with a mix of letters, numbers &amp;
+                  symbols.
+                </p>
+              </div>
+            )}
+          </form.Subscribe>
+          <form.AppField name="acceptTerms">
             {(field) => (
-              <field.TextField
-                label="Confirm password"
-                className={authInputClassName}
-                type="password"
-                placeholder="Confirm password..."
-                autoComplete="new-password"
-                disabled={!isBetterAuthMode}
-                required
+              <field.CheckboxField
+                label={
+                  <>
+                    I agree to the{" "}
+                    <a
+                      href={TERMS_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary"
+                    >
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a
+                      href={PRIVACY_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary"
+                    >
+                      Privacy Policy
+                    </a>
+                  </>
+                }
               />
             )}
           </form.AppField>
@@ -345,9 +387,6 @@ function SignUpPage() {
                   >
                     {isSubmitting ? "Creating account..." : "Create account"}
                   </Button>
-                  {isHostedMode ? (
-                    <TermsAgreementNotice action="By creating an account" />
-                  ) : null}
                 </>
               );
             }}

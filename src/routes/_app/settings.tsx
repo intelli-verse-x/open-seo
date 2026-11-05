@@ -12,11 +12,11 @@ export const Route = createFileRoute("/_app/settings")({
 // (team). Billing keeps its own page — it's linked from paywalls all over.
 function SettingsLayout() {
   const tabs = [
-    { to: "/settings" as const, label: "Personal", exact: true },
+    { to: "/settings" as const, label: "Profile", exact: true },
     // Access / no-auth self-host has no memberships — the organization tab
     // would 404.
     ...(usesBetterAuthClient()
-      ? [{ to: "/settings/organization" as const, label: "Organization" }]
+      ? [{ to: "/settings/organization" as const, label: "Team" }]
       : []),
   ];
 

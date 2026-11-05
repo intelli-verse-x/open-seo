@@ -162,74 +162,80 @@ export function ApiKeySettings() {
         query={apiKeysQuery}
         errorFallback="We couldn't load your API keys."
       >
-        {(apiKeys) =>
-          apiKeys.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No API keys yet.</p>
-          ) : (
-            <TableCard>
-              <Table>
-                <TableHeader>
+        {(apiKeys) => (
+          <TableCard>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Key</TableHead>
+                  {showOrganization ? (
+                    <TableHead>Organization</TableHead>
+                  ) : null}
+                  <TableHead>Created</TableHead>
+                  <TableHead>Last used</TableHead>
+                  <TableHead className="w-10" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {apiKeys.length === 0 ? (
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Key</TableHead>
-                    {showOrganization ? (
-                      <TableHead>Organization</TableHead>
-                    ) : null}
-                    <TableHead>Created</TableHead>
-                    <TableHead>Last used</TableHead>
-                    <TableHead className="w-10" />
+                    <TableCell
+                      colSpan={showOrganization ? 6 : 5}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      No API keys yet.
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {apiKeys.map((key) => (
-                    <TableRow key={key.id}>
-                      <TableCell className="max-w-[220px] truncate font-medium">
-                        {key.name || "Unnamed key"}
+                ) : null}
+                {apiKeys.map((key) => (
+                  <TableRow key={key.id}>
+                    <TableCell className="max-w-[220px] truncate font-medium">
+                      {key.name || "Unnamed key"}
+                    </TableCell>
+                    <TableCell
+                      className="font-mono text-xs text-muted-foreground"
+                      data-ph-mask
+                    >
+                      {key.start || "oseo_"}…
+                    </TableCell>
+                    {showOrganization ? (
+                      <TableCell className="text-xs text-muted-foreground">
+                        {organizationName(key.organizationId) ?? "—"}
                       </TableCell>
-                      <TableCell
-                        className="font-mono text-xs text-muted-foreground"
-                        data-ph-mask
+                    ) : null}
+                    <TableCell className="text-xs text-muted-foreground">
+                      {key.createdAt.toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {key.lastRequest
+                        ? key.lastRequest.toLocaleDateString()
+                        : "Never"}
+                    </TableCell>
+                    <TableCell>
+                      <RowActionsMenu
+                        label={`Actions for ${key.name || "API key"}`}
                       >
-                        {key.start || "oseo_"}…
-                      </TableCell>
-                      {showOrganization ? (
-                        <TableCell className="text-xs text-muted-foreground">
-                          {organizationName(key.organizationId) ?? "—"}
-                        </TableCell>
-                      ) : null}
-                      <TableCell className="text-xs text-muted-foreground">
-                        {key.createdAt.toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {key.lastRequest
-                          ? key.lastRequest.toLocaleDateString()
-                          : "Never"}
-                      </TableCell>
-                      <TableCell>
-                        <RowActionsMenu
-                          label={`Actions for ${key.name || "API key"}`}
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() =>
+                            setRevoking({
+                              id: key.id,
+                              name: key.name || "Unnamed key",
+                            })
+                          }
                         >
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={() =>
-                              setRevoking({
-                                id: key.id,
-                                name: key.name || "Unnamed key",
-                              })
-                            }
-                          >
-                            <Trash2 />
-                            Revoke key
-                          </DropdownMenuItem>
-                        </RowActionsMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableCard>
-          )
-        }
+                          <Trash2 />
+                          Revoke key
+                        </DropdownMenuItem>
+                      </RowActionsMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableCard>
+        )}
       </QueryState>
 
       {revoking ? (

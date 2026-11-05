@@ -1,3 +1,4 @@
+import { ResearchEmptyPanels } from "@/client/components/ResearchEmptyPanels";
 import {
   Table,
   TableBody,
@@ -25,7 +26,23 @@ export function KeywordResearchEmptyState({ controller, projectId }: Props) {
     return <NoResultsState controller={controller} />;
   }
 
-  return <SearchHistoryState controller={controller} projectId={projectId} />;
+  return (
+    <>
+      <ResearchEmptyPanels
+        metrics={[
+          "Keywords found",
+          "Total volume",
+          "Avg. difficulty",
+          "Avg. CPC",
+        ]}
+        title="Keyword ideas"
+        columns={["Keyword", "Intent", "Volume", "KD", "CPC", "Trend"]}
+      />
+      {controller.history.length ? (
+        <SearchHistoryState controller={controller} projectId={projectId} />
+      ) : null}
+    </>
+  );
 }
 
 function NoResultsState({

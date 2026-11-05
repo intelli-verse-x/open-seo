@@ -1,8 +1,12 @@
+import { useState } from "react";
+import { authClient, useSession } from "@/lib/auth-client";
+import { Input } from "@/client/components/ui/input";
+import { Button } from "@/client/components/ui/button";
+import { TeamSettings } from "@/client/features/team/TeamSettings";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ApiKeySettings } from "@/client/features/settings/ApiKeySettings";
 import { SectionHeader } from "@/client/components/PageHeader";
-import { ThemePreferenceRadio } from "@/client/components/ThemePreferenceMenuItems";
 import { everyAppAccountQueryOptions } from "@/client/features/every-app/everyAppAccountQueries";
 import { DeleteAccountSettings } from "@/client/features/settings/DeleteAccountSettings";
 import { McpConnectionsSettings } from "@/client/features/settings/McpConnectionsSettings";
@@ -24,14 +28,38 @@ function PersonalSettings() {
   // edition); the analytics choices only exist on hosted.
   const hasAccounts = usesBetterAuthClient();
   return (
-    <div className="space-y-10">
-      <section className="space-y-3">
-        <SectionHeader title="Appearance" />
-        <div className="flex items-center justify-between gap-6">
-          <span className="text-sm">Theme</span>
-          <ThemePreferenceRadio />
-        </div>
-      </section>
+    <div className="space-y-6">
+      {hasAccounts ? (
+        <>
+          <div className="toba-dashboard-grid">
+            <ProfileSettings />
+            <section className="toba-panel">
+              <h2>Notifications</h2>
+              <p>Choose what we email you about</p>
+              {[
+                "Weekly ranking report",
+                "Ranking drops",
+                "Audit completed",
+                "AI mention alerts",
+                "Product updates",
+              ].map((label) => (
+                <div
+                  className="flex items-center justify-between gap-4 py-4 text-sm"
+                  key={label}
+                >
+                  {label}
+                  <span className="text-xs text-muted-foreground">
+                    Unavailable
+                  </span>
+                </div>
+              ))}
+            </section>
+          </div>
+          <section className="toba-panel">
+            <TeamSettings />
+          </section>
+        </>
+      ) : null}
 
       {isEveryAppClientAuthMode() ? <EveryAppSettings /> : null}
 
@@ -76,6 +104,62 @@ function EveryAppSettings() {
           Open Every App →
         </a>
       ) : null}
+    </section>
+  );
+}
+
+function ProfileSettings() {
+  const { data: session } = useSession();
+  const [message, setMessage] = useState("");
+  const [pending, setPending] = useState(false);
+  return (
+    <section className="toba-panel">
+      <h2>Profile</h2>
+      <p>The information visible to your team.</p>
+      <form
+        key={session?.user.id}
+        className="mt-6 space-y-5"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          const name = new FormData(event.currentTarget)
+            .get("name")
+            ?.toString()
+            .trim();
+          if (!name) return;
+          setPending(true);
+          try {
+            const result = await authClient.updateUser({ name });
+            setMessage(result.error?.message ?? "Profile saved.");
+          } catch {
+            setMessage("Unable to save your profile. Please try again.");
+          } finally {
+            setPending(false);
+          }
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <span className="rounded-full bg-accent p-4 text-primary">
+            {session?.user.name?.slice(0, 2).toUpperCase()}
+          </span>
+          <strong>{session?.user.name}</strong>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-2 text-xs">
+            Full name
+            <Input name="name" defaultValue={session?.user.name} required />
+          </label>
+          <label className="space-y-2 text-xs">
+            Email
+            <Input type="email" value={session?.user.email ?? ""} readOnly />
+          </label>
+        </div>
+        {message ? <p role="status">{message}</p> : null}
+        <div className="flex justify-end">
+          <Button type="submit" pending={pending}>
+            Save changes
+          </Button>
+        </div>
+      </form>
     </section>
   );
 }

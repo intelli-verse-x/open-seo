@@ -1,3 +1,4 @@
+import { ResearchEmptyPanels } from "@/client/components/ResearchEmptyPanels";
 import { useEffect, useRef, type ReactNode } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { PageHeader } from "@/client/components/PageHeader";
@@ -119,22 +120,38 @@ export function ResearchPageShell<TData>({
             />
           ) : null}
 
-          {isLoading
-            ? (loadingState ?? (
-                <div className="space-y-4">
-                  <SkeletonStatGrid count={3} className="lg:grid-cols-3" />
-                  <Card>
-                    <CardContent>
-                      <SkeletonTableRows rows={6} columns={3} />
-                    </CardContent>
-                  </Card>
-                </div>
-              ))
-            : resultData
-              ? renderResults(resultData)
-              : !errorMessage
-                ? history
-                : null}
+          {isLoading ? (
+            (loadingState ?? (
+              <div className="space-y-4">
+                <SkeletonStatGrid count={3} className="lg:grid-cols-3" />
+                <Card>
+                  <CardContent>
+                    <SkeletonTableRows rows={6} columns={3} />
+                  </CardContent>
+                </Card>
+              </div>
+            ))
+          ) : resultData ? (
+            renderResults(resultData)
+          ) : (
+            <>
+              <ResearchEmptyPanels
+                title={title}
+                models
+                metrics={
+                  title === "Brand Lookup"
+                    ? [
+                        "AI visibility score",
+                        "Mentioned in",
+                        "Avg. answer position",
+                        "Citations",
+                      ]
+                    : []
+                }
+              />
+              {!errorMessage ? history : null}
+            </>
+          )}
         </div>
       </PaidPlanGate>
     </div>
