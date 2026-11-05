@@ -1,3 +1,8 @@
+import {
+  RESULT_LIMITS,
+  type ResultLimit,
+  type KeywordMode,
+} from "@/client/features/keywords/keywordResearchTypes";
 import { Info, Search } from "lucide-react";
 import { getFieldError } from "@/client/lib/forms";
 import { MAX_KEYWORDS_PER_SUBMIT } from "@/client/features/keywords/keywordResearchTypes";
@@ -45,7 +50,7 @@ export function KeywordResearchSearchBar({ controller }: Props) {
 
               return (
                 // Extra lines grow the field.
-                <InputGroup className="min-h-10 w-full lg:max-w-md lg:min-w-0 lg:flex-1">
+                <InputGroup className="min-h-10 w-full lg:min-w-0 lg:flex-1">
                   <InputGroupAddon
                     className={rows > 1 ? "self-start pt-3" : undefined}
                   >
@@ -89,29 +94,88 @@ export function KeywordResearchSearchBar({ controller }: Props) {
               )}
             </controlsForm.Field>
 
-            <controlsForm.Subscribe
-              selector={(state) => state.values.locationCode}
-            >
-              {(locationCode) => (
-                <controlsForm.Field name="locationName">
-                  {(field) => (
-                    <KeywordAreaField
-                      locationCode={locationCode}
-                      value={field.state.value}
-                      onChange={(name) => field.handleChange(name)}
-                    />
-                  )}
-                </controlsForm.Field>
+            <controlsForm.Field name="resultLimit">
+              {(field) => (
+                <select
+                  aria-label="Results"
+                  className="toba-select"
+                  value={field.state.value}
+                  onChange={(event) =>
+                    field.handleChange(
+                      Number(event.target.value) as ResultLimit,
+                    )
+                  }
+                >
+                  {RESULT_LIMITS.map((limit) => (
+                    <option key={limit} value={limit}>
+                      {limit} results
+                    </option>
+                  ))}
+                </select>
               )}
-            </controlsForm.Subscribe>
-
-            <KeywordSearchOptions controller={controller} />
+            </controlsForm.Field>
+            <controlsForm.Field name="mode">
+              {(field) => (
+                <select
+                  aria-label="Keyword source"
+                  className="toba-select"
+                  value={field.state.value}
+                  onChange={(event) =>
+                    field.handleChange(event.target.value as KeywordMode)
+                  }
+                >
+                  <option value="auto">Auto</option>
+                  <option value="suggestions">Phrase match</option>
+                  <option value="ideas">Category ideas</option>
+                  <option value="related">People also search for</option>
+                </select>
+              )}
+            </controlsForm.Field>
 
             <Button type="submit" className="w-full px-6 lg:w-auto lg:shrink-0">
               Search
             </Button>
           </div>
         </form>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span>Try:</span>
+          {[
+            "seo for saas",
+            "ai agents for small business",
+            "n8n vs zapier",
+          ].map((keyword) => (
+            <button
+              type="button"
+              className="rounded-full bg-muted px-3 py-1 font-semibold"
+              key={keyword}
+              onClick={() => controlsForm.setFieldValue("keyword", keyword)}
+            >
+              {keyword}
+            </button>
+          ))}
+          <details className="ml-auto">
+            <summary className="cursor-pointer">More options</summary>
+            <div className="flex gap-2 py-2">
+              {" "}
+              <controlsForm.Subscribe
+                selector={(state) => state.values.locationCode}
+              >
+                {(locationCode) => (
+                  <controlsForm.Field name="locationName">
+                    {(field) => (
+                      <KeywordAreaField
+                        locationCode={locationCode}
+                        value={field.state.value}
+                        onChange={(name) => field.handleChange(name)}
+                      />
+                    )}
+                  </controlsForm.Field>
+                )}
+              </controlsForm.Subscribe>
+              <KeywordSearchOptions controller={controller} />
+            </div>
+          </details>
+        </div>
         <controlsForm.Field name="keyword">
           {(field) => {
             const keywordError = getFieldError(field.state.meta.errors);

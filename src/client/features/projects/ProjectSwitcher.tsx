@@ -3,7 +3,7 @@ import { projectsQueryOptions } from "@/client/features/projects/projectQueries"
 import { Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { findLast } from "remeda";
-import { FolderCog, Plus, Settings } from "lucide-react";
+import { Folder, FolderCog, Plus, Settings } from "lucide-react";
 import { setLastProjectId } from "@/client/lib/active-project";
 import { CreateProjectModal } from "@/client/features/projects/CreateProjectModal";
 import {
@@ -125,40 +125,18 @@ export function ProjectSwitcher({
         <div className="flex items-stretch rounded-lg border border-sidebar-border bg-card">
           <ComboboxTrigger
             aria-label="Switch project"
-            className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-l-lg px-3 py-1.5 text-left hover:bg-accent"
+            className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg px-3 py-3 text-left hover:bg-accent"
           >
-            <span className="flex min-w-0 flex-col">
-              <span className="truncate text-sm font-medium">
+            <Folder className="size-4 shrink-0" />
+            <span className="mr-auto flex min-w-0 flex-col">
+              <span className="text-[10px] uppercase text-muted-foreground">
+                Project
+              </span>
+              <span className="truncate text-sm font-semibold">
                 {activeProject?.name ?? "Select project"}
               </span>
-              {activeProject?.domain ? (
-                <span className="truncate text-xs text-muted-foreground">
-                  {activeProject.domain}
-                </span>
-              ) : null}
             </span>
           </ComboboxTrigger>
-          {activeProject ? (
-            <Button
-              nativeButton={false}
-              render={
-                <Link
-                  to="/p/$projectId/settings"
-                  params={{ projectId: activeProject.id }}
-                  aria-label="Project settings"
-                  title="Project settings"
-                  onClick={() => {
-                    setOpen(false);
-                    onCloseDrawer?.();
-                  }}
-                />
-              }
-              variant="ghost"
-              className="h-auto self-stretch rounded-l-none border-0 border-l border-sidebar-border"
-            >
-              <Settings className="size-4" />
-            </Button>
-          ) : null}
         </div>
         <ComboboxContent className="w-(--anchor-width)">
           {projects.length >= SEARCH_THRESHOLD ? (
@@ -194,6 +172,28 @@ export function ProjectSwitcher({
           </ComboboxList>
           <Separator />
           <div className="grid gap-0.5 p-1">
+            {" "}
+            {activeProject ? (
+              <Button
+                nativeButton={false}
+                render={
+                  <Link
+                    to="/p/$projectId/settings"
+                    params={{ projectId: activeProject.id }}
+                    aria-label="Project settings"
+                    title="Project settings"
+                    onClick={() => {
+                      setOpen(false);
+                      onCloseDrawer?.();
+                    }}
+                  />
+                }
+                variant="ghost"
+                className="justify-start"
+              >
+                <Settings className="size-4" /> Project settings
+              </Button>
+            ) : null}
             <Button
               variant="ghost"
               className="justify-start"

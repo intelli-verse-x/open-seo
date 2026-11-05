@@ -87,35 +87,14 @@ export function AuthMethodChooser({
         onClick={onContinueWithGoogle}
         disabled={disabled || isBusy}
       >
-        <GoogleLogo />
         {isBusy ? "Opening Google..." : googleLabel}
       </Button>
 
-      <div className="toba-auth-divider">or continue with email</div>
+      <div className="toba-auth-divider">
+        or {googleLabel.startsWith("Sign up") ? "sign up" : "sign in"} with
+        email
+      </div>
     </div>
-  );
-}
-
-function GoogleLogo() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 18 18" className="size-4 shrink-0">
-      <path
-        fill="#4285F4"
-        d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z"
-      />
-      <path
-        fill="#34A853"
-        d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.33-1.58-5.04-3.72H.94v2.34A9 9 0 0 0 9 18Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M3.96 10.7A5.4 5.4 0 0 1 3.68 9c0-.59.1-1.16.28-1.7V4.96H.94A9 9 0 0 0 0 9c0 1.45.34 2.82.94 4.04l3.02-2.34Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A8.64 8.64 0 0 0 9 0 9 9 0 0 0 .94 4.96L3.96 7.3C4.67 5.16 6.66 3.58 9 3.58Z"
-      />
-    </svg>
   );
 }
 
@@ -171,17 +150,24 @@ export function AuthPageShell({ children }: { children: React.ReactNode }) {
           </p>
           <div className="toba-auth-preview">
             <p>Search visibility</p>
-            <h3>Your workspace, in focus</h3>
-            <p>Sign in to see your project’s search performance.</p>
+            <h3>72.4%</h3>
+            <span className="toba-preview-change">↑ 8.2% this month</span>
+            <div className="toba-preview-bars" aria-hidden="true">
+              {[24, 34, 30, 40, 37, 46, 43, 50, 48, 56, 53, 62, 59, 69].map(
+                (height, i) => (
+                  <i key={i} style={{ height }} />
+                ),
+              )}
+            </div>
             <div className="toba-auth-preview-grid">
               <span>
-                Keywords tracked<strong>—</strong>
+                Keywords tracked<strong>207</strong>
               </span>
               <span>
-                Top 10 rankings<strong>—</strong>
+                Top 10 rankings<strong>48</strong>
               </span>
               <span>
-                AI mentions<strong>—</strong>
+                AI mentions<strong>12</strong>
               </span>
             </div>
           </div>

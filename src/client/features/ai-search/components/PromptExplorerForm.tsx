@@ -1,3 +1,4 @@
+import { Switch } from "@/client/components/ui/switch";
 import type { FormEvent } from "react";
 import { cn } from "cn";
 import { Info } from "lucide-react";
@@ -118,7 +119,7 @@ export function PromptExplorerForm({
   return (
     <Card>
       <CardContent>
-        <form onSubmit={onSubmit} noValidate className="space-y-5">
+        <form onSubmit={onSubmit} noValidate className="space-y-4">
           <Field>
             <FieldLabel htmlFor="prompt-explorer-prompt">Prompt</FieldLabel>
             <Textarea
@@ -144,7 +145,7 @@ export function PromptExplorerForm({
             </FieldDescription>
           </Field>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[260px_1fr]">
             <Field>
               <FieldLabel htmlFor="prompt-explorer-brand">
                 Highlight brand (optional)
@@ -156,16 +157,16 @@ export function PromptExplorerForm({
                 autoComplete="off"
                 spellCheck={false}
               />
-              <FieldDescription>
-                We&apos;ll flag whether each model mentions this brand.
-              </FieldDescription>
             </Field>
 
             <Field>
               <FieldTitle>Models</FieldTitle>
-              <div className="flex flex-wrap items-start gap-x-5 gap-y-2 pt-1.5">
+              <div className="flex flex-wrap items-start gap-2">
                 {PROMPT_EXPLORER_MODELS.map((model) => (
-                  <div key={model} className="flex items-center gap-1.5">
+                  <div
+                    key={model}
+                    className="flex min-h-11 items-center gap-1.5 rounded-lg border border-border bg-muted px-3"
+                  >
                     <Label className="font-normal">
                       <Checkbox
                         checked={form.models.includes(model)}
@@ -208,14 +209,14 @@ export function PromptExplorerForm({
             </Field>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+          <div className="flex flex-wrap items-center justify-end gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <Label className="font-normal">
-                <Checkbox
+                <Switch
                   checked={form.webSearch}
                   onCheckedChange={onWebSearchChange}
                 />
-                Allow web search
+                Web search
               </Label>
               <Combobox
                 items={countryItems}
@@ -234,7 +235,7 @@ export function PromptExplorerForm({
                 <ComboboxInput
                   aria-label="Web search country"
                   placeholder="Search countries"
-                  className="w-full sm:w-80"
+                  className="w-full sm:w-40"
                 />
                 <ComboboxContent>
                   <ComboboxEmpty>No supported countries match.</ComboboxEmpty>
@@ -271,8 +272,7 @@ export function PromptExplorerForm({
               className="px-6"
               disabled={supportedModels.length === 0}
             >
-              Run {supportedModels.length}{" "}
-              {supportedModels.length === 1 ? "model" : "models"}
+              Run prompt
             </Button>
           </div>
 

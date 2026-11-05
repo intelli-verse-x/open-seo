@@ -1,3 +1,4 @@
+import { ResearchEmptyPanels } from "@/client/components/ResearchEmptyPanels";
 import { useCallback, useMemo } from "react";
 import type { SortingState, Updater } from "@tanstack/react-table";
 import { BackLink, PageHeader } from "@/client/components/PageHeader";
@@ -139,6 +140,26 @@ export function BacklinksPage({
           }}
         />
 
+        {!searchState.target ? (
+          <ResearchEmptyPanels
+            metrics={[
+              "Total backlinks",
+              "Referring domains",
+              "Dofollow",
+              "Lost links",
+            ]}
+            title="Referring domains"
+            sideTitle="Link profile"
+            columns={[
+              "Referring domain",
+              "DR",
+              "Links",
+              "Type",
+              "Anchor text",
+              "First seen",
+            ]}
+          />
+        ) : null}
         <BacklinksBody
           projectId={projectId}
           history={history}

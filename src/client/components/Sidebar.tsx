@@ -26,7 +26,6 @@ import {
   SamChatListSkeleton,
   SamSidebarPanel,
 } from "@/client/features/sam/SamSidebarPanel";
-import { ThemePreferenceRadio } from "@/client/components/ThemePreferenceMenuItems";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
 import { signOutAndRedirect, useSession } from "@/lib/auth-client";
 import {
@@ -131,9 +130,7 @@ export function Sidebar({
   /** The session is confirmed, so the sidebar's own data can load. */
   ready: boolean;
 }) {
-  // Until a project is known, show the project nav as rows without links, so
-  // the sidebar has its full shape from the first paint instead of growing
-  // once projects load. The placeholder rows never render these links.
+  // Keep the nav shape while the project loads.
   const navPlaceholder = projectId === null && projectPending;
   const navGroups =
     projectId !== null || navPlaceholder
@@ -186,29 +183,38 @@ export function Sidebar({
             aria-label="Main navigation"
             aria-busy={navPlaceholder || undefined}
           >
-            {navGroups.map((group) => (
-              <SidebarGroup key={group.label} className="py-1">
-                <SidebarGroupLabel className="toba-nav-group text-muted-foreground">
-                  {group.label}
-                </SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {group.items.map((item) => {
-                      const { icon, label, ...linkProps } = item;
-                      return (
-                        <SidebarNavLink
-                          key={linkProps.to}
-                          icon={icon}
-                          label={label}
-                          linkProps={linkProps}
-                          placeholder={navPlaceholder}
-                        />
-                      );
-                    })}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            ))}
+            {navGroups
+              .filter((group) => group.label !== "Workspace")
+              .map((group) => (
+                <SidebarGroup key={group.label} className="py-1">
+                  <SidebarGroupLabel className="toba-nav-group text-muted-foreground">
+                    {group.label}
+                  </SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {group.items
+                        .filter(
+                          (item) =>
+                            !["Prompt Tracking", "Prompt Research"].includes(
+                              item.label,
+                            ),
+                        )
+                        .map((item) => {
+                          const { icon, label, ...linkProps } = item;
+                          return (
+                            <SidebarNavLink
+                              key={linkProps.to}
+                              icon={icon}
+                              label={label}
+                              linkProps={linkProps}
+                              placeholder={navPlaceholder}
+                            />
+                          );
+                        })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              ))}
           </nav>
         )}
       </SidebarContent>
@@ -217,9 +223,7 @@ export function Sidebar({
   );
 }
 
-// Behind an Every App gateway, which owns sign-in, organizations, teams and
-// billing: the sidebar's first row links back to the gateway, and the footer
-// holds help and OpenSEO settings.
+// The gateway owns accounts in Every App mode.
 const everyApp = isEveryAppClientAuthMode();
 
 /**
@@ -283,17 +287,17 @@ function AccountFooter({ ready }: { ready: boolean }) {
   return (
     <UiSidebarFooter className="gap-0 border-t border-sidebar-border pb-safe">
       <SidebarMenu>
-        <SidebarNavLink
-          icon={CircleHelp}
-          label="Help & Support"
-          linkProps={{ to: "/support" }}
-        />
         {email && !everyApp ? (
           <>
             <SidebarNavLink
               icon={Settings}
               label="Settings"
               linkProps={{ to: "/settings" }}
+            />
+            <SidebarNavLink
+              icon={CircleHelp}
+              label="Help & Support"
+              linkProps={{ to: "/support" }}
             />
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -323,9 +327,14 @@ function AccountFooter({ ready }: { ready: boolean }) {
                   />
                 }
               >
-                <User className="size-4" />
-                <span className="truncate" data-ph-mask>
-                  {email}
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-xs font-semibold text-primary">
+                  {session?.user.name?.slice(0, 2).toUpperCase() ?? "U"}
+                </span>
+                <span className="truncate text-xs" data-ph-mask>
+                  <strong className="block">
+                    {session?.user.name ?? email}
+                  </strong>
+                  <span className="text-muted-foreground">{email}</span>
                 </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" className="w-56">
@@ -380,12 +389,6 @@ function AccountFooter({ ready }: { ready: boolean }) {
                     Billing
                   </DropdownMenuItem>
                 ) : null}
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>Theme</DropdownMenuLabel>
-                  <div className="px-1 pb-1">
-                    <ThemePreferenceRadio />
-                  </div>
-                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"

@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Input } from "@/client/components/ui/input";
+import { CircleHelp } from "lucide-react";
 import { projectsQueryOptions } from "@/client/features/projects/projectQueries";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -139,6 +141,29 @@ export function AuthenticatedAppLayout({
                 ? "Settings"
                 : "ToBa SEO")}
           </span>
+          <form
+            className="toba-topbar-search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const q = new FormData(event.currentTarget)
+                .get("q")
+                ?.toString()
+                .trim();
+              if (q && sidebarProjectId)
+                window.location.assign(
+                  `/p/${encodeURIComponent(sidebarProjectId)}/keywords?q=${encodeURIComponent(q)}`,
+                );
+            }}
+          >
+            <Input
+              name="q"
+              aria-label="Search keywords"
+              placeholder="Search keywords, domains..."
+            />
+          </form>
+          <Link to="/support" aria-label="Help & Support">
+            <CircleHelp size={20} />
+          </Link>
         </div>
         <SeoApiStatusBanners
           shouldShowSeoApiWarning={shouldShowSeoApiWarning}

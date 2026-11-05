@@ -7,7 +7,6 @@ import { Button } from "@/client/components/ui/button";
 import {
   AuthPageCard,
   AuthMethodChooser,
-  TermsAgreementNotice,
   authInputClassName,
   authSubmitClassName,
   authRedirectSearchSchema,
@@ -141,24 +140,21 @@ function SignInPage() {
         </p>
       }
     >
-      {isHostedMode ? (
+      {
         <>
           <AuthMethodChooser
             googleLabel="Continue with Google"
-            disabled={!isHostedMode}
+            disabled={!isBetterAuthMode}
             isBusy={google.isStarting}
             onContinueWithGoogle={() => {
               void google.start();
             }}
           />
-          {isHostedMode ? (
-            <TermsAgreementNotice action="By continuing with Google" />
-          ) : null}
           {google.error ? (
             <p className="text-sm text-destructive">{google.error}</p>
           ) : null}
         </>
-      ) : null}
+      }
       <form.AppForm>
         <form.Form className="space-y-4">
           <form.AppField name="email">

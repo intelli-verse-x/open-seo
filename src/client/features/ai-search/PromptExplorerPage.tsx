@@ -252,31 +252,33 @@ export function PromptExplorerPage({
       }
       renderResults={(result) => <PromptExplorerResults result={result} />}
       history={
-        <RecentSearches
-          items={history}
-          loaded={historyLoaded}
-          onRemove={removeHistoryItem}
-          emptyIcon={MessageSquare}
-          emptyTitle="Enter a prompt to compare model answers"
-          getTitle={(item) => item.prompt}
-          getSubtitle={(item) => item.models.map(formatModelLabel).join(", ")}
-          renderLink={(item, props) => (
-            <Link
-              from="/p/$projectId/prompt-explorer"
-              to="/p/$projectId/prompt-explorer"
-              params={{ projectId }}
-              search={{
-                q: item.prompt,
-                models: item.models,
-                web: item.webSearch ? undefined : false,
-                cc: item.webSearchCountryCode,
-                hb: item.highlightBrand || undefined,
-              }}
-              replace
-              {...props}
-            />
-          )}
-        />
+        history.length ? (
+          <RecentSearches
+            items={history}
+            loaded={historyLoaded}
+            onRemove={removeHistoryItem}
+            emptyIcon={MessageSquare}
+            emptyTitle="Enter a prompt to compare model answers"
+            getTitle={(item) => item.prompt}
+            getSubtitle={(item) => item.models.map(formatModelLabel).join(", ")}
+            renderLink={(item, props) => (
+              <Link
+                from="/p/$projectId/prompt-explorer"
+                to="/p/$projectId/prompt-explorer"
+                params={{ projectId }}
+                search={{
+                  q: item.prompt,
+                  models: item.models,
+                  web: item.webSearch ? undefined : false,
+                  cc: item.webSearchCountryCode,
+                  hb: item.highlightBrand || undefined,
+                }}
+                replace
+                {...props}
+              />
+            )}
+          />
+        ) : null
       }
     />
   );
