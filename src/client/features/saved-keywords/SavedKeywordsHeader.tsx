@@ -30,7 +30,7 @@ export function SavedKeywordsHeader({
     <>
       <PageHeader
         title="Saved Keywords"
-        description="Save keyword ideas from research, organize them with tags, and revisit when you're ready to act."
+        description="Keywords you've bookmarked, organized with tags."
         actions={
           <>
             <ImportKeywordsButton projectId={projectId} />

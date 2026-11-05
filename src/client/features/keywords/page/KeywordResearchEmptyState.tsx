@@ -1,3 +1,12 @@
+import {
+  Table,
+  TableBody,
+  TableCard,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/client/components/ui/table";
 import { Link } from "@tanstack/react-router";
 import { Globe, Search } from "lucide-react";
 import { EmptyState } from "@/client/components/EmptyState";
@@ -27,26 +36,45 @@ function NoResultsState({
   const { lastSearchKeyword, lastSearchLocationCode } = controller;
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-border bg-card">
-      <EmptyState
-        variant="plain"
-        icon={Globe}
-        title="Not enough keyword data for this query yet"
-        description={
-          <>
-            We could not find keyword opportunities for
-            <span className="font-medium text-foreground">
-              {` "${lastSearchKeyword}" `}
-            </span>
-            in
-            <span className="font-medium text-foreground">
-              {` ${LOCATIONS[lastSearchLocationCode] || "this location"}`}
-            </span>
-            .
-          </>
-        }
-      />
-    </div>
+    <TableCard>
+      <h2 className="mb-3 text-base font-semibold">Keyword ideas</h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Keyword</TableHead>
+            <TableHead>Intent</TableHead>
+            <TableHead>Volume</TableHead>
+            <TableHead>KD</TableHead>
+            <TableHead>CPC</TableHead>
+            <TableHead>Trend</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell colSpan={6}>
+              <EmptyState
+                variant="plain"
+                icon={Globe}
+                title="Not enough keyword data for this query yet"
+                description={
+                  <>
+                    We could not find keyword opportunities for
+                    <span className="font-medium text-foreground">
+                      {` "${lastSearchKeyword}" `}
+                    </span>
+                    in
+                    <span className="font-medium text-foreground">
+                      {` ${LOCATIONS[lastSearchLocationCode] || "this location"}`}
+                    </span>
+                    .
+                  </>
+                }
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableCard>
   );
 }
 

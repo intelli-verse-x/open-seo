@@ -11,7 +11,11 @@ export function NavTabs({
   children: ReactNode;
 }) {
   return (
-    <nav aria-label={label} className="flex gap-1 border-b border-border">
+    <nav
+      data-slot="nav-tabs"
+      aria-label={label}
+      className="flex gap-1 border-b border-border"
+    >
       {children}
     </nav>
   );
@@ -22,6 +26,7 @@ export function NavTabs({
 function NavTabAnchor({ className, ...props }: ComponentProps<"a">) {
   return (
     <a
+      data-slot="nav-tab"
       className={cn(
         "relative inline-flex h-9 items-center px-3 text-sm font-medium text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:rounded-md focus-visible:ring-3 focus-visible:ring-ring/50 data-[status=active]:text-foreground",
         "after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-foreground after:opacity-0 data-[status=active]:after:opacity-100",

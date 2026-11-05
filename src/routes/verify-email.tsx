@@ -1,3 +1,4 @@
+import { ArrowLeft, Mail } from "lucide-react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -6,6 +7,7 @@ import { Spinner } from "@/client/components/ui/spinner";
 import {
   AuthPageCard,
   AuthPageShell,
+  authSubmitClassName,
   authRedirectSearchSchema,
 } from "@/client/features/auth/AuthPage";
 import { captureClientEvent } from "@/client/lib/posthog";
@@ -61,7 +63,7 @@ function getVerifyEmailPageCopy({
 }) {
   if (!isHostedMode) {
     return {
-      title: "Verify email",
+      title: "Check your email",
       helperText: "Email confirmation isn't available right now.",
     };
   }
@@ -191,6 +193,7 @@ function VerifyEmailPage() {
   return (
     <AuthPageShell>
       <AuthPageCard
+        icon={<Mail />}
         title={pageCopy.title}
         helperText={pageCopy.helperText}
         footer={
@@ -198,9 +201,9 @@ function VerifyEmailPage() {
             <Link
               to="/sign-in"
               search={getSignInSearch(redirectTo)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              Back to sign in
+              <ArrowLeft size={16} /> Back to sign in
             </Link>
           </p>
         }
@@ -215,7 +218,7 @@ function VerifyEmailPage() {
           <Button
             type="button"
             variant="secondary"
-            className="w-full"
+            className={authSubmitClassName}
             pending={isResending}
             onClick={() => void handleResend()}
           >

@@ -1,3 +1,4 @@
+import { ArrowLeft, LockKeyhole, Mail } from "lucide-react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useAppForm } from "@/client/components/form/useAppForm";
 import { Alert, AlertDescription } from "@/client/components/ui/alert";
@@ -5,6 +6,8 @@ import { Button } from "@/client/components/ui/button";
 import {
   AuthPageCard,
   AuthPageShell,
+  authInputClassName,
+  authSubmitClassName,
   authRedirectSearchSchema,
 } from "@/client/features/auth/AuthPage";
 import { getFormError } from "@/client/lib/forms";
@@ -82,7 +85,8 @@ function ForgotPasswordPage() {
 
           return (
             <AuthPageCard
-              title={isSuccess ? "Check your email" : "Forgot password"}
+              icon={isSuccess ? <Mail /> : <LockKeyhole />}
+              title={isSuccess ? "Check your email" : "Reset your password"}
               helperText={
                 isSuccess
                   ? undefined
@@ -97,9 +101,9 @@ function ForgotPasswordPage() {
                   <Link
                     to="/sign-in"
                     search={getSignInSearch(redirectTo)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Back to sign in
+                    <ArrowLeft size={16} /> Back to sign in
                   </Link>
                 </p>
               }
@@ -118,8 +122,9 @@ function ForgotPasswordPage() {
                       {(field) => (
                         <field.TextField
                           label="Email address"
+                          className={authInputClassName}
                           type="email"
-                          placeholder="Email address..."
+                          placeholder="you@company.com"
                           autoComplete="email"
                           disabled={!isHostedMode}
                           required
@@ -135,7 +140,7 @@ function ForgotPasswordPage() {
                     <Button
                       type="submit"
                       variant="secondary"
-                      className="w-full"
+                      className={authSubmitClassName}
                       pending={isSubmitting}
                       disabled={!isHostedMode}
                     >

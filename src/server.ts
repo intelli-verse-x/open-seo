@@ -223,7 +223,7 @@ async function handleAppRequest(
 
   // The browser uses accounts. In-cluster jobs still call /mcp with no session.
   // The header is set only by the internal proxy and stripped on the public gate.
-  const mcpInternal = Reflect.get(env, "OPENSEO_MCP_INTERNAL");
+  const mcpInternal: unknown = Reflect.get(env, "OPENSEO_MCP_INTERNAL");
   if (
     pathname === MCP_ROUTE &&
     typeof mcpInternal === "string" &&
