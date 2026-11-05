@@ -39,6 +39,7 @@ const UTM_PARAMS = [
 
 const signUpSchema = z
   .object({
+    name: z.string().trim().min(1, "Enter your full name."),
     email: z.string().trim().email("Enter a valid email address."),
     password: passwordSchema,
     confirmPassword: z.string(),
@@ -100,6 +101,7 @@ function SignUpPage() {
 
   const form = useAppForm({
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -129,7 +131,7 @@ function SignUpPage() {
           );
         }
         const result = await authClient.signUp.email({
-          name: email.split("@")[0] || "OpenSEO User",
+          name: value.name.trim(),
           email,
           password: value.password,
           callbackURL: verificationCallbackURL.toString(),
@@ -195,27 +197,8 @@ function SignUpPage() {
     },
   });
 
-  if (standalone && !firstAccount && !invited) {
-    if (signUpStatus.isPending) return <PageLoading />;
-    return (
-      <AuthPageCard
-        title="Registration is closed"
-        helperText="Ask an administrator for an invitation."
-        footer={
-          <p className="text-sm">
-            <Link
-              to="/sign-in"
-              search={getSignInSearch(redirectTo)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Back to sign in
-            </Link>
-          </p>
-        }
-      >
-        {null}
-      </AuthPageCard>
-    );
+  if (standalone && !firstAccount && !invited && signUpStatus.isPending) {
+    return <PageLoading />;
   }
 
   return (
@@ -226,7 +209,7 @@ function SignUpPage() {
           ? "This installation has no accounts yet. The first one becomes the administrator."
           : invited
             ? "Use the email address that received the invitation."
-            : undefined
+            : "Start tracking keywords and AI visibility in minutes."
       }
       footer={
         standalone ? (
@@ -278,13 +261,25 @@ function SignUpPage() {
       ) : null}
       <form.AppForm>
         <form.Form className="space-y-4">
+          <form.AppField name="name">
+            {(field) => (
+              <field.TextField
+                label="Full name"
+                className={authInputClassName}
+                placeholder="Your full name"
+                autoComplete="name"
+                disabled={!isBetterAuthMode}
+                required
+              />
+            )}
+          </form.AppField>
           <form.AppField name="email">
             {(field) => (
               <field.TextField
                 label="Email address"
                 className={authInputClassName}
                 type="email"
-                placeholder="Email address..."
+                placeholder="you@company.com"
                 autoComplete="email"
                 disabled={!isBetterAuthMode}
                 required
@@ -297,7 +292,7 @@ function SignUpPage() {
                 label="Password"
                 className={authInputClassName}
                 type="password"
-                placeholder="Password..."
+                placeholder="Enter your password"
                 autoComplete="new-password"
                 disabled={!isBetterAuthMode}
                 required

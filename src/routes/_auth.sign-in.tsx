@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAppForm } from "@/client/components/form/useAppForm";
 import { Button } from "@/client/components/ui/button";
 import {
@@ -25,6 +26,7 @@ import {
 import { z } from "zod";
 
 const signInSchema = z.object({
+  rememberMe: z.boolean(),
   email: z.string().trim().email("Enter a valid email address."),
   password: z.string().min(1, "Enter your password."),
 });
@@ -36,6 +38,7 @@ export const Route = createFileRoute("/_auth/sign-in")({
 
 function SignInPage() {
   const search = Route.useSearch();
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { redirectTo, oauthQuery, isHostedMode, isBetterAuthMode } =
     useAuthPageState(search.redirect);
@@ -63,6 +66,7 @@ function SignInPage() {
     defaultValues: {
       email: "",
       password: "",
+      rememberMe: true,
     },
     validators: {
       onSubmit: signInSchema,
@@ -77,6 +81,7 @@ function SignInPage() {
         const result = await authClient.signIn.email({
           email,
           password: value.password,
+          rememberMe: value.rememberMe,
           callbackURL: toAuthCallbackURL(redirectTo),
           ...(oauthQuery ? { oauth_query: oauthQuery } : {}),
         });
@@ -124,29 +129,16 @@ function SignInPage() {
       title="Welcome back"
       helperText="Sign in to your ToBa SEO workspace to continue."
       footer={
-        emailOnly ? (
-          <p className="text-sm text-foreground/50">
-            Need an account? Ask an administrator for an invitation. Forgot your
-            password? Ask your server administrator to reset it.
-          </p>
-        ) : isHostedMode ? (
-          <div className="flex w-full justify-between text-sm text-muted-foreground">
-            <Link
-              to="/forgot-password"
-              search={getSignInSearch(redirectTo)}
-              className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-            >
-              Forgot password?
-            </Link>
-            <Link
-              to="/sign-up"
-              search={getSignInSearch(redirectTo)}
-              className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-            >
-              Create account
-            </Link>
-          </div>
-        ) : null
+        <p className="text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link
+            to="/sign-up"
+            search={getSignInSearch(redirectTo)}
+            className="font-semibold text-primary"
+          >
+            Create account
+          </Link>
+        </p>
       }
     >
       {isHostedMode ? (
@@ -184,17 +176,45 @@ function SignInPage() {
           </form.AppField>
           <form.AppField name="password">
             {(field) => (
-              <field.TextField
-                label="Password"
-                className={authInputClassName}
-                type="password"
-                placeholder="Enter your password"
-                autoComplete="current-password"
-                disabled={!isBetterAuthMode}
-                required
-              />
+              <div className="toba-password-field">
+                <field.TextField
+                  label="Password"
+                  className={authInputClassName}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  disabled={!isBetterAuthMode}
+                  required
+                />
+                <button
+                  type="button"
+                  className="toba-password-toggle"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword((visible) => !visible)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             )}
           </form.AppField>
+          <div className="flex items-center justify-between gap-4 text-sm">
+            <form.AppField name="rememberMe">
+              {(field) => (
+                <field.CheckboxField
+                  label="Remember me"
+                  disabled={!isBetterAuthMode}
+                />
+              )}
+            </form.AppField>
+            <Link
+              to="/forgot-password"
+              search={getSignInSearch(redirectTo)}
+              className="shrink-0 font-semibold text-primary"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           <form.Subscribe
             selector={(state) => ({

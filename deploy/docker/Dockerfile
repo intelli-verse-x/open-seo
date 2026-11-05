@@ -21,7 +21,7 @@ EXPOSE 3001
 # These three values are the build fingerprint on seo.toba-tech.ai. The
 # entrypoint skips vite when dist/.openseo-build-env matches the live env.
 ENV VITE_OPENSEO_LEGACY_DOCKER=true
-ENV AUTH_MODE=local_noauth
+ENV AUTH_MODE=password
 ENV VITE_SHOW_DEVTOOLS=false
 
 RUN pnpm run build \

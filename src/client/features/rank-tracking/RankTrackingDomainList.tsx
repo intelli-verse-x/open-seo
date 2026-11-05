@@ -1,3 +1,11 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/client/components/ui/table";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -217,22 +225,37 @@ export function RankTrackingDomainList({
               }
             />
           ) : (
-            filteredSummaries.map((summary) => (
-              <DomainRow
-                key={summary.id}
-                projectId={projectId}
-                summary={summary}
-                // Only needed to tell apart trackers that differ by language
-                // alone; otherwise the language is just noise.
-                showLanguage={allSummaries.some(
-                  (other) =>
-                    other.domain === summary.domain &&
-                    other.locationCode === summary.locationCode &&
-                    other.languageCode !== summary.languageCode,
-                )}
-                onArchive={() => setArchiveTarget(summary)}
-              />
-            ))
+            <div className="p-5">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Domain / market</TableHead>
+                    <TableHead className="text-right">Keywords</TableHead>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSummaries.map((summary) => (
+                    <DomainRow
+                      key={summary.id}
+                      projectId={projectId}
+                      summary={summary}
+                      // Only needed to tell apart trackers that differ by language
+                      // alone; otherwise the language is just noise.
+                      showLanguage={allSummaries.some(
+                        (other) =>
+                          other.domain === summary.domain &&
+                          other.locationCode === summary.locationCode &&
+                          other.languageCode !== summary.languageCode,
+                      )}
+                      onArchive={() => setArchiveTarget(summary)}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </div>
 
@@ -266,15 +289,16 @@ function DomainRow({
   onArchive: () => void;
 }) {
   return (
-    <div className="relative flex w-full items-center gap-4 px-5 py-3.5 transition-colors hover:bg-foreground/[0.03]">
-      <Link
-        to="/p/$projectId/rank-tracking/$configId"
-        params={{ projectId, configId: summary.id }}
-        className="absolute inset-0 z-0"
-        aria-label={`Open ${summary.domain}`}
-      />
-      <div className="min-w-0 flex-1 pointer-events-none">
-        <p className="font-medium truncate">{summary.domain}</p>
+    <TableRow>
+      <TableCell>
+        <Link
+          to="/p/$projectId/rank-tracking/$configId"
+          params={{ projectId, configId: summary.id }}
+          className="font-semibold hover:underline"
+          aria-label={`Open ${summary.domain}`}
+        >
+          {summary.domain}
+        </Link>
         <p className="text-xs text-muted-foreground">
           {summary.locationName
             ? formatLocationLabel(summary.locationName, 2)
@@ -303,7 +327,7 @@ function DomainRow({
                 <Tooltip>
                   <TooltipTrigger
                     render={
-                      // Above the row link, like the archive button.
+                      // Keep the incomplete-check explanation keyboard accessible.
                       <span
                         aria-label="Last check incomplete"
                         className="pointer-events-auto relative z-10 ml-1 inline-flex cursor-help align-text-bottom"
@@ -324,7 +348,6 @@ function DomainRow({
           <div className="mt-1 flex items-center gap-2 text-xs text-destructive">
             <CircleAlert className="size-3" />
             Scheduled check skipped: out of credits
-            {/* Above the row link, like the archive button. */}
             <span className="pointer-events-auto relative z-10">
               <GetCreditsButton />
             </span>
@@ -336,32 +359,35 @@ function DomainRow({
             Scheduled check skipped — paid plan required
           </p>
         )}
-      </div>
-      <div className="hidden sm:flex items-center gap-6 text-sm pointer-events-none">
-        {summary.keywordCount > 0 && (
-          <div className="text-center">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              Keywords
-            </p>
-            <p className="font-mono font-medium">{summary.keywordCount}</p>
-          </div>
-        )}
-      </div>
-      <Button
-        variant="ghost"
-        size="icon-xs"
-        className="relative z-10 text-muted-foreground hover:text-destructive"
-        title="Archive domain"
-        aria-label={`Archive ${summary.domain}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          onArchive();
-        }}
-      >
-        <Archive className="size-4" />
-      </Button>
-      <ChevronRight className="size-4 shrink-0 text-muted-foreground pointer-events-none" />
-    </div>
+      </TableCell>
+      <TableCell className="text-right tabular-nums">
+        {summary.keywordCount}
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="relative z-10 text-muted-foreground hover:text-destructive"
+            title="Archive domain"
+            aria-label={`Archive ${summary.domain}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onArchive();
+            }}
+          >
+            <Archive className="size-4" />
+          </Button>
+          <Link
+            to="/p/$projectId/rank-tracking/$configId"
+            params={{ projectId, configId: summary.id }}
+            aria-label={`View ${summary.domain}`}
+          >
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+          </Link>
+        </div>
+      </TableCell>
+    </TableRow>
   );
 }

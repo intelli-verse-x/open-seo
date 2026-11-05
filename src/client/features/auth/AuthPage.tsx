@@ -124,15 +124,18 @@ export function AuthPageCard({
   helperText,
   children,
   footer,
+  icon,
 }: {
   title: string;
   helperText?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  icon?: React.ReactNode;
 }) {
   return (
     <div className="toba-auth-card w-full space-y-6">
       <div className="space-y-3">
+        {icon ? <div className="toba-auth-icon">{icon}</div> : null}
         <div>
           <h1 className="text-3xl font-semibold">{title}</h1>
           {helperText ? (

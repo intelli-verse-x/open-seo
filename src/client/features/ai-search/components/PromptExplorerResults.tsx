@@ -26,11 +26,11 @@ type Props = {
 };
 
 const ARTICLE_CLASS =
-  "overflow-hidden rounded-r-lg border border-l-4 border-border bg-card";
+  "min-w-0 overflow-hidden rounded-2xl border border-border bg-card";
 
 export function PromptExplorerResults({ result }: Props) {
   return (
-    <div className="space-y-5">
+    <div className="grid items-start gap-4 xl:grid-cols-2">
       {result.results.map((modelResult) => (
         <ModelResultCard
           key={modelResult.model}

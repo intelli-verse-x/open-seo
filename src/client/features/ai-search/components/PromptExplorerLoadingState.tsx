@@ -12,12 +12,16 @@ export function PromptExplorerLoadingState({
   models: PromptExplorerModel[];
 }) {
   return (
-    <div className="space-y-5" aria-busy="true" aria-label="Loading answers">
+    <div
+      className="grid items-start gap-4 xl:grid-cols-2"
+      aria-busy="true"
+      aria-label="Loading answers"
+    >
       {models.map((model) => (
         <article
           key={model}
           className={cn(
-            "overflow-hidden rounded-r-lg border border-l-4 border-border bg-card",
+            "min-w-0 overflow-hidden rounded-2xl border border-border bg-card",
             getModelAccent(model).border,
           )}
         >

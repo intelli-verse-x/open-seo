@@ -1,3 +1,4 @@
+import { useSession } from "@/lib/auth-client";
 import { Link } from "@tanstack/react-router";
 import { Link2, Settings } from "lucide-react";
 import { EmptyState } from "@/client/components/EmptyState";
@@ -45,6 +46,7 @@ export function DashboardPage({
   tab?: z.infer<typeof dashboardSiteTabSchema>;
   onTabChange: (tab: z.infer<typeof dashboardSiteTabSchema>) => void;
 }) {
+  const { data: session } = useSession();
   const activationQuery = useQuery({
     queryKey: ["dashboardActivation", projectId],
     queryFn: () => getDashboardActivation({ data: { projectId } }),
@@ -178,10 +180,10 @@ export function DashboardPage({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Your website
+              {activation.domain || "Your workspace"}
             </p>
             <h1 className="text-2xl font-semibold">
-              {activation.domain || "Dashboard"}
+              Welcome back{session?.user.name ? `, ${session.user.name}` : ""}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Search visibility, links and site health in one place.

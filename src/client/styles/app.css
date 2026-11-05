@@ -683,3 +683,82 @@ h3,
   background: currentColor;
   mask: url("/toba/sparkles.svg") center / contain no-repeat;
 }
+
+/* Auth controls follow the Figma form while keeping route-owned mutations. */
+.toba-auth-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  background: var(--accent);
+  color: var(--primary);
+}
+.toba-password-field {
+  position: relative;
+}
+.toba-password-field input {
+  padding-right: 44px;
+}
+.toba-password-field input[type="text"] {
+  padding-left: 42px;
+  background-image: url("/toba/lock.svg");
+  background-size: 18px;
+  background-position: 14px center;
+  background-repeat: no-repeat;
+}
+.toba-password-toggle {
+  position: absolute;
+  top: 35px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+.toba-password-toggle:focus-visible {
+  outline: 2px solid var(--ring);
+  border-radius: 4px;
+}
+
+/* The same table, tab and card chrome on every existing research route. */
+.toba-content [data-slot="card"]:not([data-size="sm"]) {
+  --card-spacing: 20px;
+}
+.toba-content [data-slot="table-card"] {
+  padding: 20px;
+}
+.toba-content [data-slot="table-container"] {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.toba-content [data-slot="table-card"] > [data-slot="table-container"] {
+  margin-block: 12px;
+}
+.toba-content [data-slot="nav-tabs"] {
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 0;
+}
+.toba-content [data-slot="nav-tab"] {
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background: var(--muted);
+  padding-inline: 14px;
+}
+.toba-content [data-slot="nav-tab"][data-status="active"] {
+  border-color: var(--primary);
+  background: var(--accent);
+  color: var(--primary);
+}
+.toba-content [data-slot="nav-tab"]::after {
+  display: none;
+}
+@media (max-width: 767px) {
+  .toba-content [data-slot="table-card"] {
+    padding: 12px;
+  }
+}
